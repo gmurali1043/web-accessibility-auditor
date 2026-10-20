@@ -39,6 +39,50 @@ Then open http://localhost:8060 in your browser. Everything runs locally —
 no data leaves your machine except the actual HTTP requests to the page(s)
 you choose to audit.
 
+## Hosted (public) version
+
+The same code can also run as a public website, so people can use it
+without installing anything. Local use is unaffected: the public behaviour
+below only switches on when the `PUBLIC_MODE=1` environment variable is set,
+which the `Dockerfile` does.
+
+In public mode the app:
+
+- **Only audits public websites.** Every connection the headless browser
+  makes (pages, redirects, iframes, scripts, fetch/XHR, WebSockets), plus
+  the crawler's robots.txt/sitemap fetches, goes through a small filtering
+  proxy (`checker/netguard.py`) that resolves each destination itself and
+  refuses private, loopback, link-local and other non-public addresses.
+  This stops visitors from using the server to read its own internal
+  network (e.g. cloud metadata at `169.254.169.254`).
+- **Limits usage:** up to 10 URLs per audit and 30 pages per crawl, one
+  running job per visitor, 20 jobs per visitor per hour, and 2 audits
+  running at once server-wide (more wait in a short queue).
+- **Keeps results in memory for 1 hour**, then discards them. Nothing is
+  written to `results/`.
+
+All limits can be changed with environment variables of the same name:
+`MAX_URLS_PER_AUDIT`, `MAX_CRAWL_PAGES`, `MAX_CONCURRENT_JOBS`,
+`MAX_QUEUED_JOBS`, `JOBS_PER_IP_PER_HOUR`, `RESULT_TTL_SECONDS`.
+
+### Deploying to Hugging Face Spaces (free)
+
+1. Create a Hugging Face account, then **New Space** → SDK **Docker** →
+   template **Blank**. Note its name, e.g. `your-username/web-accessibility-auditor`.
+2. Create a Hugging Face access token with **Write** permission
+   (Settings → Access Tokens).
+3. In this GitHub repo, go to **Settings → Secrets and variables → Actions**:
+   - **Secrets** tab: add `HF_TOKEN` = the token from step 2.
+   - **Variables** tab: add `HF_SPACE` = the Space name from step 1.
+4. Run the **Deploy to Hugging Face Space** workflow from the **Actions** tab
+   (or push to `main`). From then on, every push to `main` redeploys
+   automatically. The first build takes several minutes.
+
+The workflow (`.github/workflows/deploy-hf-space.yml`) adds the Space's
+settings header to the README copy it pushes, so this README stays as is.
+Any other Docker host (Google Cloud Run, Render, Railway, Fly.io) can run
+the same `Dockerfile`; give it at least 2 GB of memory.
+
 ## Using the tool
 
 - **URL Audit tab** — paste one or more URLs (up to 25) and run a full audit.
@@ -88,8 +132,13 @@ listed in the report so nothing silently disappears from the count.
 ## Architecture
 
 ```
-app.py                  Flask app / API routes
+app.py                  Flask app / API routes (audits and crawls run as
+                         background jobs the page polls for)
+Dockerfile              Container for the hosted version (PUBLIC_MODE=1)
 checker/
+  config.py              Local vs. public mode settings and limits
+  netguard.py            Public mode: filtering proxy that blocks
+                          private/internal network addresses
   registry.py            Loads data/test_cases.json
   axe_runner.py           Injects vendored axe-core, runs a full scan
   custom_checks.py        ~45 Playwright/DOM heuristic checks, including
@@ -145,4 +194,4 @@ templates/, static/     Frontend (vanilla HTML/CSS/JS, no build step)
   slower than a plain link crawl, especially at higher Max pages/Max depth.
 - A single audit run is capped at 25 URLs; crawl discovery is capped at 60
   pages by default (configurable in the Crawl tab, hard cap enforced
-  server-side).
+  server-side). The hosted version uses lower caps (see above).

@@ -4,7 +4,7 @@ from fnmatch import fnmatch
 
 from playwright.sync_api import sync_playwright
 
-from . import axe_runner, custom_checks
+from . import axe_runner, custom_checks, netguard
 from .browser import launch_browser
 from .registry import TEST_CASES, all_ids_in_order
 
@@ -46,7 +46,9 @@ def _new_page(context, url):
     page = context.new_page()
     nav_error = None
     try:
-        page.goto(url, wait_until="load", timeout=NAV_TIMEOUT_MS)
+        resp = page.goto(url, wait_until="load", timeout=NAV_TIMEOUT_MS)
+        if resp and resp.headers.get(netguard.BLOCKED_HEADER.lower()):
+            return page, netguard.BLOCKED_MESSAGE
         try:
             page.wait_for_load_state("networkidle", timeout=5000)
         except Exception:

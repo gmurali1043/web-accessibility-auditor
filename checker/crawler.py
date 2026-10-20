@@ -5,6 +5,7 @@ from urllib.parse import urlparse, urldefrag, urljoin
 import requests
 from playwright.sync_api import sync_playwright
 
+from . import config, netguard
 from .browser import launch_browser
 
 USER_AGENT = "Mozilla/5.0 (compatible; WebAccessibilityAuditor/1.0; +local-tool)"
@@ -74,8 +75,13 @@ def _is_html_candidate(url, base_netloc):
 # ---------------------------------------------------------------------------
 
 def _fetch_text(url):
+    proxies = None
+    if config.PUBLIC_MODE:
+        proxy = netguard.proxy_url()
+        proxies = {"http": proxy, "https": proxy}
     try:
-        resp = requests.get(url, timeout=REQUEST_TIMEOUT, headers={"User-Agent": USER_AGENT})
+        resp = requests.get(url, timeout=REQUEST_TIMEOUT, headers={"User-Agent": USER_AGENT},
+                            proxies=proxies)
         if resp.status_code == 200:
             return resp.text
     except Exception:
@@ -285,6 +291,10 @@ def discover_pages(start_url, max_pages=40, max_depth=3, use_sitemap=True):
 
                 status = resp.status if resp else None
                 content_type = resp.headers.get("content-type", "") if resp else ""
+                if resp and resp.headers.get(netguard.BLOCKED_HEADER.lower()):
+                    errors.append({"url": url, "error": netguard.BLOCKED_MESSAGE})
+                    page.close()
+                    continue
                 if status and status >= 400:
                     errors.append({"url": url, "error": f"HTTP {status}"})
                     page.close()

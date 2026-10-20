@@ -346,6 +346,40 @@ function hideStatusIn(id) {
   document.getElementById(id).hidden = true;
 }
 
+// Audits and crawls run as background jobs on the server: POST starts one
+// and returns a job id, then we poll until it finishes. onProgress is only
+// called when the page count changes, so the aria-live status region isn't
+// re-announced on every poll.
+const JOB_POLL_MS = 1500;
+const MAX_URLS = Number(document.body.dataset.maxUrls) || 25;
+
+async function runJob(endpoint, body, onProgress) {
+  const resp = await fetch(endpoint, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const started = await resp.json();
+  if (!resp.ok) throw new Error(started.error || "Request failed");
+
+  let lastDone = null;
+  for (;;) {
+    await new Promise(resolve => setTimeout(resolve, JOB_POLL_MS));
+    const pollResp = await fetch(`/api/jobs/${started.job_id}`);
+    const job = await pollResp.json();
+    if (!pollResp.ok) throw new Error(job.error || "Request failed");
+    if (job.status === "done") return job.result;
+    if (job.status === "error") throw new Error(job.error || "Request failed");
+    if (onProgress && job.progress && job.progress.done !== lastDone) {
+      lastDone = job.progress.done;
+      onProgress(job.progress);
+    }
+  }
+}
+
+function auditProgressMessage(progress) {
+  return `Audited ${progress.done} of ${progress.total} page(s)... this can take a while.`;
+}
+
 function wireDownloadButtons(scopeEl, getBatchId) {
   scopeEl.querySelectorAll(".dl-btn").forEach(btn => {
     btn.onclick = () => {
@@ -439,12 +473,8 @@ const AuditTab = (() => {
     runBtn.disabled = true;
     showStatusIn("audit-status", `Auditing ${urls.length} page(s)... this runs axe-core plus ~45 custom checks per page, including keyboard tests of menus and accordions, and can take a while.`);
     try {
-      const resp = await fetch("/api/audit", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ urls }),
-      });
-      const data = await resp.json();
-      if (!resp.ok) throw new Error(data.error || "Request failed");
+      const data = await runJob("/api/audit", { urls },
+        progress => progress.done && showStatusIn("audit-status", auditProgressMessage(progress)));
       hideStatusIn("audit-status");
       batchId = data.batch_id;
       renderResultsInto("audit", data);
@@ -487,17 +517,12 @@ const CrawlTab = (() => {
     discoverBtn.disabled = true;
     showStatusIn("crawl-discover-status", `Crawling ${url}... each page is rendered in a real browser, so this can take a while for a large Max pages value.`);
     try {
-      const resp = await fetch("/api/crawl-discover", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          url,
-          max_pages: Number(maxPagesInput.value) || 40,
-          max_depth: Number(maxDepthInput.value) || 3,
-          use_sitemap: useSitemapInput.checked,
-        }),
+      const data = await runJob("/api/crawl-discover", {
+        url,
+        max_pages: Number(maxPagesInput.value) || 40,
+        max_depth: Number(maxDepthInput.value) || 3,
+        use_sitemap: useSitemapInput.checked,
       });
-      const data = await resp.json();
-      if (!resp.ok) throw new Error(data.error || "Request failed");
 
       discovered = data.pages || [];
       const sitemapCount = data.sitemap_seed_count || 0;
@@ -580,8 +605,8 @@ const CrawlTab = (() => {
     const boxes = getCheckboxes().filter(cb => cb.checked);
     const urls = boxes.map(cb => discovered[Number(cb.dataset.idx)].url);
     if (!urls.length) return;
-    if (urls.length > 25) {
-      showStatusIn("crawl-status", `${urls.length} pages selected, but a single audit run is capped at 25. Please select 25 or fewer.`, true);
+    if (urls.length > MAX_URLS) {
+      showStatusIn("crawl-status", `${urls.length} pages selected, but a single audit run is capped at ${MAX_URLS}. Please select ${MAX_URLS} or fewer.`, true);
       return;
     }
 
@@ -589,12 +614,8 @@ const CrawlTab = (() => {
     runCheckBtn.disabled = true;
     showStatusIn("crawl-status", `Auditing ${urls.length} page(s)... this can take a while.`);
     try {
-      const resp = await fetch("/api/audit", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ urls }),
-      });
-      const data = await resp.json();
-      if (!resp.ok) throw new Error(data.error || "Request failed");
+      const data = await runJob("/api/audit", { urls },
+        progress => progress.done && showStatusIn("crawl-status", auditProgressMessage(progress)));
       hideStatusIn("crawl-status");
       batchId = data.batch_id;
       renderResultsInto("crawl", data);

@@ -6,7 +6,7 @@
 <title>Web Accessibility Auditor</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body data-max-urls="{{ max_urls }}">
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
 <header class="topbar">
@@ -21,6 +21,13 @@
 </header>
 
 <main id="main-content">
+  {% if public_mode %}
+  <p class="public-notice">
+    You're using the hosted version: up to {{ max_urls }} pages per audit and
+    {{ max_crawl_pages }} pages per crawl, public websites only. For larger runs or
+    intranet/localhost sites, <a href="https://github.com/gmurali1043/web-accessibility-auditor">run it locally</a>.
+  </p>
+  {% endif %}
   <div class="tabs" role="tablist" aria-label="Audit pages by">
     <button id="tabbtn-audit" class="tab-btn active" role="tab"
             aria-selected="true" aria-controls="tab-audit" tabindex="0"
@@ -35,7 +42,7 @@
            aria-labelledby="tabbtn-audit" tabindex="0">
     <div class="panel-card">
       <h2>Audit a single URL or a batch of URLs</h2>
-      <label for="urlInput">Enter one or more page URLs (one per line, up to 25).</label>
+      <label for="urlInput">Enter one or more page URLs (one per line, up to {{ max_urls }}).</label>
       <textarea id="urlInput" rows="5" placeholder="https://example.com/
 https://example.com/about
 https://example.com/contact"></textarea>
@@ -79,7 +86,7 @@ https://example.com/contact"></textarea>
             </button>
             <span class="tooltip-bubble" id="tip-max-pages" role="tooltip">The total number of pages the crawler will collect before stopping, no matter how deep it goes. Whichever limit &ndash; Max pages or Max depth &ndash; is hit first ends the crawl.</span>
           </span>
-          <input type="number" id="maxPagesInput" value="40" min="1" max="60">
+          <input type="number" id="maxPagesInput" value="{{ [40, max_crawl_pages]|min }}" min="1" max="{{ max_crawl_pages }}">
         </div>
         <div class="field-with-info">
           <label for="maxDepthInput">Max depth</label>
@@ -93,7 +100,7 @@ https://example.com/contact"></textarea>
             </button>
             <span class="tooltip-bubble" id="tip-max-depth" role="tooltip">How many link "hops" away from your starting URL the crawler will follow. The start page is depth 0; links on it are depth 1; links on those pages are depth 2; and so on. Pages found via sitemap.xml aren't limited by this.</span>
           </span>
-          <input type="number" id="maxDepthInput" value="3" min="1" max="5">
+          <input type="number" id="maxDepthInput" value="3" min="1" max="{{ max_crawl_depth }}">
         </div>
       </div>
       <label class="checkbox-row">

@@ -95,6 +95,9 @@ input[type="number"]{width:80px;padding:8px;}
 
 .status-banner{margin-top:20px;padding:14px 18px;border-radius:8px;background:#fff3cd;
                border:1px solid #ffe08a;font-size:14px;}
+.public-notice{margin:0 0 16px;padding:12px 16px;border-radius:8px;background:var(--automated-bg);
+               border:1px solid var(--automated);font-size:14px;color:var(--text);}
+.public-notice a{color:#1f54c9;}
 .status-banner.error{background:var(--fail-bg);border-color:var(--fail);color:var(--fail);}
 
 /* -------------------------------------------------------------- page picker (crawl) -- */

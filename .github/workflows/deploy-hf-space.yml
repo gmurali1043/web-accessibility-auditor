@@ -1,0 +1,41 @@
+# Copies each push to main to a Hugging Face Space, which builds the
+# Dockerfile and serves the public version. Does nothing until the repo has
+# an HF_SPACE variable (e.g. "your-hf-username/web-accessibility-auditor")
+# and an HF_TOKEN secret (a Hugging Face access token with write access).
+name: Deploy to Hugging Face Space
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: vars.HF_SPACE != ''
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Push to Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE: ${{ vars.HF_SPACE }}
+        run: |
+          # Spaces read their settings from YAML front matter in README.md.
+          # Add it only to the copy pushed to the Space, so the GitHub
+          # README stays clean.
+          {
+            printf -- '---\ntitle: Web Accessibility Auditor\nemoji: "\xe2\x99\xbf"\ncolorFrom: blue\ncolorTo: indigo\nsdk: docker\napp_port: 7860\npinned: false\n---\n\n'
+            cat README.md
+          } > README.space.md
+          mv README.space.md README.md
+
+          # Push a single fresh commit so the Space only ever holds the
+          # current code, not the GitHub history.
+          rm -rf .git
+          git init -q -b main
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Deploy ${GITHUB_SHA::7} from GitHub"
+          git push --force "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE}" main
