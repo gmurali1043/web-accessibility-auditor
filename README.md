@@ -44,7 +44,10 @@ you choose to audit.
 The same code can also run as a public website, so people can use it
 without installing anything. Local use is unaffected: the public behaviour
 below only switches on when the `PUBLIC_MODE=1` environment variable is set,
-which the `Dockerfile` does.
+which the `Dockerfile` does. The `Dockerfile` also sets `RUN_JOBS_INLINE=1`,
+which runs each audit inside the request that started it (Cloud Run only
+gives a container CPU while a request is open), so the hosted version shows
+no page-by-page progress.
 
 In public mode the app:
 
@@ -63,25 +66,34 @@ In public mode the app:
 
 All limits can be changed with environment variables of the same name:
 `MAX_URLS_PER_AUDIT`, `MAX_CRAWL_PAGES`, `MAX_CONCURRENT_JOBS`,
-`MAX_QUEUED_JOBS`, `JOBS_PER_IP_PER_HOUR`, `RESULT_TTL_SECONDS`.
+`MAX_QUEUED_JOBS`, `JOBS_PER_IP_PER_HOUR`, `RESULT_TTL_SECONDS`,
+`RUN_JOBS_INLINE`.
 
-### Deploying to Hugging Face Spaces (free)
+### Deploying to Google Cloud Run
 
-1. Create a Hugging Face account, then **New Space** → SDK **Docker** →
-   template **Blank**. Note its name, e.g. `your-username/web-accessibility-auditor`.
-2. Create a Hugging Face access token with **Write** permission
-   (Settings → Access Tokens).
-3. In this GitHub repo, go to **Settings → Secrets and variables → Actions**:
-   - **Secrets** tab: add `HF_TOKEN` = the token from step 2.
-   - **Variables** tab: add `HF_SPACE` = the Space name from step 1.
-4. Run the **Deploy to Hugging Face Space** workflow from the **Actions** tab
-   (or push to `main`). From then on, every push to `main` redeploys
-   automatically. The first build takes several minutes.
+Cloud Run builds the `Dockerfile` straight from this GitHub repo and
+redeploys on every push to `main`. Light use fits in its free monthly
+allowance (a billing account is still required).
 
-The workflow (`.github/workflows/deploy-hf-space.yml`) adds the Space's
-settings header to the README copy it pushes, so this README stays as is.
-Any other Docker host (Google Cloud Run, Render, Railway, Fly.io) can run
-the same `Dockerfile`; give it at least 2 GB of memory.
+1. In the Google Cloud console, create a project and enable billing.
+2. Go to **Cloud Run → Deploy container → Service**, choose
+   **Continuously deploy from a repository (source or function)** and
+   **Set up with Cloud Build**. Connect GitHub, pick this repository and
+   branch `^main$`, and choose build type **Dockerfile** (`/Dockerfile`).
+3. Settings (the important ones):
+   - **Authentication:** allow public access (unauthenticated invocations).
+   - **Billing:** request-based. **Minimum instances:** 0.
+     **Maximum instances: 1** (jobs and results are kept in memory, so all
+     visitors must reach the same instance).
+   - **Container → Resources:** memory **2 GiB**, CPU **1**.
+   - **Container → Settings → Request timeout:** **1800** seconds.
+   - **Execution environment:** second generation.
+4. Click **Create**. The first build takes several minutes; the service URL
+   is shown at the top of the service page.
+
+Set a budget alert under **Billing → Budgets & alerts** so you're told if
+usage ever goes beyond the free allowance. Other Docker hosts can run the
+same `Dockerfile`; give them at least 2 GB of memory and a single instance.
 
 ## Using the tool
 
@@ -134,7 +146,8 @@ listed in the report so nothing silently disappears from the count.
 ```
 app.py                  Flask app / API routes (audits and crawls run as
                          background jobs the page polls for)
-Dockerfile              Container for the hosted version (PUBLIC_MODE=1)
+Dockerfile              Container for the hosted version (PUBLIC_MODE=1,
+                         RUN_JOBS_INLINE=1)
 checker/
   config.py              Local vs. public mode settings and limits
   netguard.py            Public mode: filtering proxy that blocks

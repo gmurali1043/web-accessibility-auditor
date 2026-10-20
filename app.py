@@ -124,7 +124,9 @@ def _admission_error(ip):
 
 def _start_job(work):
     """Runs work(job) on a background thread and returns a 202 response
-    with the job id, or an error response if admission limits are hit."""
+    with the job id, or an error response if admission limits are hit.
+    With RUN_JOBS_INLINE, runs it within this request and returns the
+    result (200) or error (500) directly."""
     _cleanup_expired()
     ip = request.remote_addr or "unknown"
     with STATE_LOCK:
@@ -151,6 +153,12 @@ def _start_job(work):
             job["finished"] = time.time()
             if JOB_SLOTS:
                 JOB_SLOTS.release()
+
+    if config.RUN_JOBS_INLINE:
+        run()
+        if job["status"] == "error":
+            return jsonify({"error": job["error"]}), 500
+        return jsonify(job["result"])
 
     threading.Thread(target=run, daemon=True).start()
     return jsonify({"job_id": job_id}), 202
@@ -263,6 +271,6 @@ def api_download(batch_id, fmt):
 
 if __name__ == "__main__":
     if config.PUBLIC_MODE:
-        app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 7860)), threaded=True)
+        app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)), threaded=True)
     else:
         app.run(debug=True, port=8060, use_reloader=False)

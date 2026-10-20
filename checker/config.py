@@ -33,3 +33,10 @@ MAX_CONCURRENT_JOBS = _env_int("MAX_CONCURRENT_JOBS", 2)
 MAX_QUEUED_JOBS = _env_int("MAX_QUEUED_JOBS", 6)
 JOBS_PER_IP_PER_HOUR = _env_int("JOBS_PER_IP_PER_HOUR", 20)
 RESULT_TTL_SECONDS = _env_int("RESULT_TTL_SECONDS", 3600)
+
+# RUN_JOBS_INLINE=1 runs each audit/crawl inside the HTTP request that
+# started it instead of on a background thread. Needed on hosts that only
+# give the container CPU while a request is open (Google Cloud Run's
+# default request-based billing); the page then gets the result directly
+# instead of polling, at the cost of the "N of M pages" progress updates.
+RUN_JOBS_INLINE = _env_flag("RUN_JOBS_INLINE")

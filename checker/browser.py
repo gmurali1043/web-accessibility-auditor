@@ -15,6 +15,9 @@ def launch_browser(p):
     options = {}
     if config.PUBLIC_MODE:
         options["proxy"] = {"server": netguard.proxy_url()}
+        # Containers often have a tiny /dev/shm; use /tmp instead so
+        # Chromium doesn't crash on large pages.
+        options["args"] = ["--disable-dev-shm-usage"]
     last_error = None
     for channel in CHANNELS:
         try:

@@ -349,7 +349,8 @@ function hideStatusIn(id) {
 // Audits and crawls run as background jobs on the server: POST starts one
 // and returns a job id, then we poll until it finishes. onProgress is only
 // called when the page count changes, so the aria-live status region isn't
-// re-announced on every poll.
+// re-announced on every poll. (When the server runs jobs inline, the POST
+// itself returns the finished result and there's nothing to poll.)
 const JOB_POLL_MS = 1500;
 const MAX_URLS = Number(document.body.dataset.maxUrls) || 25;
 
@@ -360,6 +361,7 @@ async function runJob(endpoint, body, onProgress) {
   });
   const started = await resp.json();
   if (!resp.ok) throw new Error(started.error || "Request failed");
+  if (!started.job_id) return started;
 
   let lastDone = null;
   for (;;) {
