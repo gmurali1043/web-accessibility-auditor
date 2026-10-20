@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web Accessibility Auditor</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">&#9878;</span>
+    <div>
+      <h1>Web Accessibility Auditor</h1>
+      <p>axe-core 4.13.0 + Playwright, mapped to your 104-item VGAR Web test suite</p>
+      <p class="poc-credit">POC created by: Muralikrishna Guntupalli</p>
+    </div>
+  </div>
+</header>
+
+<main id="main-content">
+  <div class="tabs" role="tablist" aria-label="Audit pages by">
+    <button id="tabbtn-audit" class="tab-btn active" role="tab"
+            aria-selected="true" aria-controls="tab-audit" tabindex="0"
+            data-tab="audit">URL Audit</button>
+    <button id="tabbtn-crawl" class="tab-btn" role="tab"
+            aria-selected="false" aria-controls="tab-crawl" tabindex="-1"
+            data-tab="crawl">Crawl a Site</button>
+  </div>
+
+  <!-- ============================================================ AUDIT == -->
+  <section id="tab-audit" class="tab-panel active" role="tabpanel"
+           aria-labelledby="tabbtn-audit" tabindex="0">
+    <div class="panel-card">
+      <h2>Audit a single URL or a batch of URLs</h2>
+      <label for="urlInput">Enter one or more page URLs (one per line, up to 25).</label>
+      <textarea id="urlInput" rows="5" placeholder="https://example.com/
+https://example.com/about
+https://example.com/contact"></textarea>
+      <button id="runAuditBtn" class="primary-btn">Run accessibility audit</button>
+    </div>
+
+    <section id="audit-status" class="status-banner" role="status" aria-live="polite" hidden></section>
+
+    <section id="audit-results" class="results" hidden aria-labelledby="audit-results-h">
+      <div class="results-header">
+        <h2 id="audit-results-h">Results</h2>
+        <div class="downloads">
+          <span id="audit-dl-label">Download report:</span>
+          <button class="dl-btn" data-fmt="html" aria-describedby="audit-dl-label">.html</button>
+          <button class="dl-btn" data-fmt="md" aria-describedby="audit-dl-label">.md</button>
+          <button class="dl-btn" data-fmt="xlsx" aria-describedby="audit-dl-label">.xlsx</button>
+        </div>
+      </div>
+      <div id="audit-overview" class="overview"></div>
+      <div id="audit-reportList"></div>
+    </section>
+  </section>
+
+  <!-- ============================================================ CRAWL == -->
+  <section id="tab-crawl" class="tab-panel" role="tabpanel"
+           aria-labelledby="tabbtn-crawl" tabindex="0" hidden>
+    <div class="panel-card">
+      <h2>Crawl a site domain</h2>
+      <label for="domainInput">Enter a domain or starting URL. The crawler renders each page in a real browser (so JavaScript-rendered navigation is found too) and follows same-site links, including sibling subdomains.</label>
+      <input type="text" id="domainInput" placeholder="example.com">
+      <div class="crawl-options">
+        <div class="field-with-info">
+          <label for="maxPagesInput">Max pages</label>
+          <span class="info-tip">
+            <button type="button" class="info-btn" aria-label="What does Max pages mean?" aria-describedby="tip-max-pages" aria-expanded="false">
+              <svg class="info-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.3"></circle>
+                <line x1="8" y1="7.1" x2="8" y2="11.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></line>
+                <circle cx="8" cy="4.6" r="0.9" fill="currentColor"></circle>
+              </svg>
+            </button>
+            <span class="tooltip-bubble" id="tip-max-pages" role="tooltip">The total number of pages the crawler will collect before stopping, no matter how deep it goes. Whichever limit &ndash; Max pages or Max depth &ndash; is hit first ends the crawl.</span>
+          </span>
+          <input type="number" id="maxPagesInput" value="40" min="1" max="60">
+        </div>
+        <div class="field-with-info">
+          <label for="maxDepthInput">Max depth</label>
+          <span class="info-tip">
+            <button type="button" class="info-btn" aria-label="What does Max depth mean?" aria-describedby="tip-max-depth" aria-expanded="false">
+              <svg class="info-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.3"></circle>
+                <line x1="8" y1="7.1" x2="8" y2="11.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></line>
+                <circle cx="8" cy="4.6" r="0.9" fill="currentColor"></circle>
+              </svg>
+            </button>
+            <span class="tooltip-bubble" id="tip-max-depth" role="tooltip">How many link "hops" away from your starting URL the crawler will follow. The start page is depth 0; links on it are depth 1; links on those pages are depth 2; and so on. Pages found via sitemap.xml aren't limited by this.</span>
+          </span>
+          <input type="number" id="maxDepthInput" value="3" min="1" max="5">
+        </div>
+      </div>
+      <label class="checkbox-row">
+        <input type="checkbox" id="useSitemapInput" checked>
+        Full site-indexing crawl &mdash; also read sitemap.xml (via robots.txt or the default location) so every page the site declares is included, not just ones reachable by following links. Honors robots.txt Disallow rules.
+      </label>
+      <button id="runDiscoverBtn" class="primary-btn">Discover pages</button>
+    </div>
+
+    <section id="crawl-discover-status" class="status-banner" role="status" aria-live="polite" hidden></section>
+
+    <section id="crawl-picker" class="panel-card picker-card" hidden aria-labelledby="crawl-picker-h">
+      <h2 id="crawl-picker-h">Choose which pages to audit</h2>
+      <fieldset>
+        <legend class="visually-hidden">Pages found while crawling the site</legend>
+        <div class="picker-toolbar">
+          <label class="select-all-label">
+            <input type="checkbox" id="selectAllPages">
+            Select all pages
+          </label>
+          <span id="page-selected-count" class="picker-count" aria-live="polite">0 of 0 selected</span>
+        </div>
+        <ul id="pageCheckList" class="pdf-checklist"></ul>
+      </fieldset>
+      <button id="runCrawlAuditBtn" class="primary-btn" disabled>Run accessibility audit on selected pages</button>
+    </section>
+
+    <section id="crawl-status" class="status-banner" role="status" aria-live="polite" hidden></section>
+
+    <section id="crawl-results" class="results" hidden aria-labelledby="crawl-results-h">
+      <div class="results-header">
+        <h2 id="crawl-results-h">Results</h2>
+        <div class="downloads">
+          <span id="crawl-dl-label">Download report:</span>
+          <button class="dl-btn" data-fmt="html" aria-describedby="crawl-dl-label">.html</button>
+          <button class="dl-btn" data-fmt="md" aria-describedby="crawl-dl-label">.md</button>
+          <button class="dl-btn" data-fmt="xlsx" aria-describedby="crawl-dl-label">.xlsx</button>
+        </div>
+      </div>
+      <div id="crawl-overview" class="overview"></div>
+      <div id="crawl-reportList"></div>
+    </section>
+  </section>
+</main>
+
+<footer>
+  <p>Runs entirely on your machine (local Playwright + axe-core, no cloud calls). Of the 104 test cases, some are fully automated, most are partially automated with human-reviewable evidence, and the rest are marked <em>Manual Review Required</em> because they need live assistive-technology or physical-device testing. See <a href="#" id="footerTestCasesLink">the full test case mapping</a>.</p>
+</footer>
+
+<dialog id="testCasesDialog">
+  <div class="dialog-inner">
+    <div class="dialog-head">
+      <h2>Test case automation mapping</h2>
+      <button id="closeTestCasesDialog" class="dl-btn" aria-label="Close">Close</button>
+    </div>
+    <div id="testCasesSummary" class="overview"></div>
+    <div id="testCasesTableWrap"></div>
+  </div>
+</dialog>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

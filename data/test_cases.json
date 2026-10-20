@@ -1,0 +1,2426 @@
+[
+  {
+    "id": "GEN-4-1",
+    "title": "Use an Automated Testing Tool",
+    "category": "Quick Check",
+    "requirement": "Use an Automated Testing Tool (GEN-4-1)",
+    "expectation": "When run against the page, the automated validation tool MUST NOT report any errors.",
+    "tool": "Accessibility Insights",
+    "procedure": "1) Run one automated validation tool of your choice against the page and confirm that it reports no errors. \n2) If errors are found, record a FAIL with a FAIL ID for each issue reported by the tool.",
+    "outcomes": "Pass = automated tool returns 0 errors\n\nFail = automated tool returns 1 or more errors",
+    "automation": "automated",
+    "method": "Runs the full axe-core v4.13.0 rule set (WCAG 2.0/2.1/2.2 A & AA rulesets) against the rendered page.",
+    "checks": [
+      "axe:*"
+    ],
+    "wcag": []
+  },
+  {
+    "id": "INT-6-3",
+    "title": "No Blinking or Flashing",
+    "category": "Quick Check",
+    "requirement": "No Blinking or Flashing (INT-6-3)",
+    "expectation": "Content that blinks or flashes MUST never be used.",
+    "tool": "Visual Inspection",
+    "procedure": "1) Perform a visual inspection of the page\n2) Confirm that each page contains no content that blinks or flashes.",
+    "outcomes": "Pass = content that blinks or flashes is not used\n\nFail = content that blinks or flashes is used",
+    "automation": "partial",
+    "method": "Detects <marquee>/<blink> elements and CSS animations/transitions with infinite iteration count as candidate blinking content; confirms visually with a short multi-frame screenshot diff.",
+    "checks": [
+      "custom:blink_flash"
+    ],
+    "wcag": [
+      {
+        "sc": "2.3.1",
+        "name": "Three Flashes or Below Threshold",
+        "level": "A"
+      },
+      {
+        "sc": "2.2.2",
+        "name": "Pause, Stop, Hide",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "VIS-3-1",
+    "title": "Text Alternatives",
+    "category": "Quick Check",
+    "requirement": "Text Alternatives (VIS-3-1)",
+    "expectation": "All non-text content MUST provide text alternatives that provide equivalent information, context, and purpose to the user using the following techniques (as applicable):\n• For <img> elements, provide the text alternative using the alt attribute\n• For other non-text content (i.e. role=\"img\"), aria-label/labelledby, or visibly hidden text\n• For decorative<img> elements, provide alt=\"\" (alt null)\n• For other decorative non-text content, aria-hidden=\"true\"",
+    "tool": "Accessibility Insights",
+    "procedure": "Using Accessibility Insights, confirm that all non-text content provides text alternatives that provide equivalent information, context, and purpose to the user AND that decorative non-text content is appropriately hidden using null alternative text or aria-hidden=\"true\"",
+    "outcomes": "Pass = all non-text content provides text alternatives AND all decorative content is hidden correctly\n\nFail = some non-text content does not have text alternatives OR some decorative content is not hidden correctly\n\nNA = non-text content is not present",
+    "automation": "automated",
+    "method": "axe-core validates alt text, aria-label/labelledby, and decorative-hiding on images, icons and other non-text content.",
+    "checks": [
+      "axe:image-alt",
+      "axe:image-redundant-alt",
+      "axe:area-alt",
+      "axe:input-image-alt",
+      "axe:object-alt",
+      "axe:role-img-alt",
+      "axe:svg-img-alt",
+      "axe:aria-hidden-body"
+    ],
+    "wcag": [
+      {
+        "sc": "1.1.1",
+        "name": "Non-text Content",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "GEN-1-1",
+    "title": "Accurate Title",
+    "category": "Quick Check",
+    "requirement": "Accurate Title (GEN-1-1)",
+    "expectation": "An accurate and descriptive page <title> title MUST be included on every page or view.",
+    "tool": "ANDI",
+    "procedure": "Use ANDI>Structures>More Details>Page Title or inspect the HTML DOM and confirm that a <title> element is present.\nVerify that the page title provided is accurate and descriptive of the purpose of the page and content.",
+    "outcomes": "Pass = page title is accurate and descriptive of the page content\n\nFail = page title is not included OR page title is inaccurate and/or not descriptive of the page content",
+    "automation": "partial",
+    "method": "axe confirms a non-empty <title> exists; the tool also flags boilerplate/very short titles. Whether the title is truly descriptive of page purpose is a human judgment.",
+    "checks": [
+      "axe:document-title",
+      "custom:title_presence"
+    ],
+    "wcag": [
+      {
+        "sc": "2.4.2",
+        "name": "Page Titled",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "TXT-1-4",
+    "title": "Sequential Headings",
+    "category": "Quick Check",
+    "requirement": "Sequential Headings (TXT-1-4)",
+    "expectation": "Headings MUST be implemented sequentially in order without skipping levels. (i.e., Heading 1, then Heading 2, then Heading 3 and so on). Headings of the same level may be repeated (e.g., H2, H2, H2, etc.).",
+    "tool": "ANDI",
+    "procedure": "1) Open ANDI>Structures>Headings\n2) View all headings instances listed below the 'Headings' tab and confirm that headings occur in sequential order without skipping levels. (i.e., Heading 1, then Heading 2, then Heading 3 and so on, no skipping numbers).\n\n",
+    "outcomes": "Pass = headings descend in single increments with no skipping\n\nFail = headings do not descend in single increments and levels are skipped",
+    "automation": "automated",
+    "method": "axe-core's heading-order rule flags any heading level skip.",
+    "checks": [
+      "axe:heading-order",
+      "axe:empty-heading"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-5-2",
+    "title": "Link Text In and Out of Context",
+    "category": "Quick Check",
+    "requirement": "Link Text In and Out of Context (INT-5-2)",
+    "expectation": "Link text MUST describe the destination or purpose of every link in a way that makes the destination or purpose clear to all users when taken out of context (i.e., in a list of links for the page).  Some of the link text may be hidden via CSS provided the text left visible makes sense when taken in context of the enclosing sentence, table header(s) or preceding heading.",
+    "tool": "ANDI",
+    "procedure": "Bring up the list of links with ANDI and confirm link text is unique and descriptive. Links describe the destination or purpose of every link in a way that makes the destination or purpose clear to all users when taken out of context (i.e., in a list of links for the page). Some of the link text may be hidden via CSS provided the text left visible makes sense when taken in context of the enclosing sentence, table header(s) or preceding heading.",
+    "outcomes": "Pass = all link text is unique and descriptive of its purpose\n\nFail = link text is not unique or it is not descriptive of its purpose\n\nNA = no links are present",
+    "automation": "partial",
+    "method": "axe validates every link has an accessible name; a custom check flags generic/ambiguous text (\"click here\", \"read more\") and links that share text but point to different destinations. Judging whether text is contextually clear still needs a human.",
+    "checks": [
+      "axe:link-name",
+      "custom:generic_link_text"
+    ],
+    "wcag": [
+      {
+        "sc": "2.4.4",
+        "name": "Link Purpose (In Context)",
+        "level": "A"
+      },
+      {
+        "sc": "2.4.9",
+        "name": "Link Purpose (Link Only)",
+        "level": "AAA"
+      }
+    ]
+  },
+  {
+    "id": "VIS-2-1",
+    "title": "Color Contrast Ratio",
+    "category": "Quick Check",
+    "requirement": "Color Contrast Ratio (VIS-2-1)",
+    "expectation": "A color contrast ratio of text, informational images, and images of text to their backgrounds MUST be at least 4.5:1, except if the text is 18 point or 14 point bold or larger, where a ratio of 3:1 is then required. Text that is part of a logo is not subject to this requirement.\n\nIF there is content that does not pass color contrast requirements, then an alternate (high-contrast) compliant style sheet must be available.",
+    "tool": "WebAIM Contrast Checker",
+    "procedure": "Use a contrast analyzer to check color contrast ratio of text, and images of text to their backgrounds. Use the eye  dropper tool to check any text that is missed by the automated scan. If a failure is identified with the automated scan which seems questionable use the eye dropper tool to double check. Contrast ratio MUST be at least 4.5:1, except if the text is 18 point or 14 point bold or larger, where a ratio of 3:1 is then required.\n\nNote: All of this information will be provided in the contrast validation tool's side panel, except for text that is not HTML text or an HTML colored background (e.g., text over a gradient image). In this case, use the color picker tool from the panel to pick samples and determine if the text fails in any places.\n\nIF there is content that does not pass color contrast requirements, then an alternate (high-contrast) compliant style sheet must be available.",
+    "outcomes": "Pass = all text meets expected minimum contrast ratio \n\nFail = all text does not meet the expected minimum contrast ratio AND an alternate style sheet is not provided.\n\nNA = text is part of an inactive user interface component or pure decoration",
+    "automation": "automated",
+    "method": "axe-core's color-contrast engine computes the rendered contrast ratio of text against its background for every text node.",
+    "checks": [
+      "axe:color-contrast"
+    ],
+    "wcag": [
+      {
+        "sc": "1.4.3",
+        "name": "Contrast (Minimum)",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "VIS-2-2",
+    "title": "Contrast for Non-text UI Components",
+    "category": "Quick Check",
+    "requirement": "Contrast for Non-text UI Components (VIS-2-2)",
+    "expectation": "User interface components and graphical objects MUST have a contrast ration of at least 3:1 against adjacent colors. ",
+    "tool": "WebAIM Contrast Checker",
+    "procedure": "Confirm that all user interface components and graphical objects have a contrast ratio of at least 3:1 against adjacent colors including the background and other non-text objects by using the eye dropper tool in a contrast analyzer",
+    "outcomes": "Pass = all user interface components and graphical objects have a contrast ratio of 3:1 against adjacent colors\n\nFail = some user interface components and/or graphical objects do not have a contrast ratio of 3:1 against adjacent colors",
+    "automation": "manual",
+    "method": "No reliable automated technique exists to identify which non-text graphical objects are meaningful UI components vs. decoration, which is required before a contrast ratio can even be computed.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "1.4.11",
+        "name": "Non-text Contrast",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "NAV-2-1",
+    "title": "Visible Keyboard Focus",
+    "category": "Quick Check",
+    "requirement": "Visible Keyboard Focus (NAV-2-1)",
+    "expectation": "A highly visible cue MUST always be presented to indicate keyboard focus. The focus indicator must maintain a minimum 3:1 contrast ratio against the background at all times to be considered highly visible. As the user navigates, they are consistently aware of the current position of keyboard focus and the focus indicator is not obscured by any content.",
+    "tool": "Keyboard",
+    "procedure": "Tab through the entire page and confirm that the keyboard focus indicator is always clearly visible; As the user navigates, they are consistently aware of the current position of keyboard focus and the focus indicator is not obscured by any content",
+    "outcomes": "Pass = a highly visible indication of keyboard focus is always visible during keyboard or other modes of sequential navigation interaction AND the focus indicator maintains a 3:1 contrast ratio against the background at all times AND a portion of the focus indicator is visible\n\nFail = a highly visible keyboard focus indicator is not visible at all times OR the focus indicator does not maintain a 3:1 contrast ratio against the background at all times",
+    "automation": "partial",
+    "method": "Tabs through all focusable elements and reads the computed outline/box-shadow style at each stop, computing its contrast ratio against the adjacent background and flagging outline:none with no visible replacement.",
+    "checks": [
+      "custom:focus_visibility"
+    ],
+    "wcag": [
+      {
+        "sc": "2.4.7",
+        "name": "Focus Visible",
+        "level": "AA"
+      },
+      {
+        "sc": "1.4.11",
+        "name": "Non-text Contrast",
+        "level": "AA"
+      },
+      {
+        "sc": "2.4.11",
+        "name": "Focus Not Obscured (Minimum)",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "NAV-2-3",
+    "title": "Default Tab Order",
+    "category": "Quick Check",
+    "requirement": "Default Tab Order (NAV-2-3)",
+    "expectation": "Default tab order of focusable elements MUST not be overridden; the natural order of the HTML code SHOULD match the rendered page’s logical order.",
+    "tool": "Keyboard",
+    "procedure": "Tab through the entire page and confirm that the tab order matches the logical order of the content.",
+    "outcomes": "Pass = the focus order follows the natural order of the HTML content and the rendered page's logical order appropriately\n\nFail = the focus order does not follow the natural order of the HTML content and/or the rendered page's logical order appropriately",
+    "automation": "partial",
+    "method": "Flags any positive tabindex value (an explicit anti-pattern that overrides natural order). Confirming the DOM order matches the visual reading order for complex layouts still needs a human.",
+    "checks": [
+      "custom:tab_order"
+    ],
+    "wcag": [
+      {
+        "sc": "2.4.3",
+        "name": "Focus Order",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "NAV-1-1",
+    "title": "Keyboard Support",
+    "category": "Quick Check",
+    "requirement": "Keyboard Support (NAV-1-1)",
+    "expectation": "All functionality and content MUST be available to users via the keyboard only (without a mouse) without requiring specific timing of keystrokes.",
+    "tool": "Keyboard",
+    "procedure": "Run through all use cases using keyboard only (i.e., without a mouse), confirming that all features and functionality are fully available to users.",
+    "outcomes": "Pass = all features and functionality are fully available to keyboard users\n\nFail = one ore more features or functionality are not fully available to keyboard users",
+    "automation": "partial",
+    "method": "A heuristic scan flags elements with click handlers that are not natively focusable and lack a role/tabindex, which are likely keyboard-inaccessible. Full functional coverage of every use case requires a manual keyboard walkthrough. Interactive checks also press Enter/Space/Arrow Down on expand/collapse controls and submenu triggers to confirm they open from the keyboard, that Tab (or the menu itself) moves focus into an opened submenu, and that role=\"menu\" submenus close on Escape and return focus to their trigger.",
+    "checks": [
+      "custom:keyboard_reachability",
+      "custom:disclosure_toggle",
+      "custom:menu_keyboard",
+      "custom:hover_menu_keyboard"
+    ],
+    "wcag": [
+      {
+        "sc": "2.1.1",
+        "name": "Keyboard",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "NAV-1-3",
+    "title": "No Keyboard Trap",
+    "category": "Quick Check",
+    "requirement": "No Keyboard Trap (NAV-1-3)",
+    "expectation": "If any part of the UI takes control of keyboard focus (e.g., PDF viewer or modal window) it MUST, through keyboard commands only, allow focus to return to the launching element and browser. ",
+    "tool": "Keyboard",
+    "procedure": "Run through all use cases using keyboard only (i.e., without a mouse), confirm that no UI elements take control of keyboard focus unless they also return focus.",
+    "outcomes": "Pass = no UI elements take control of keyboard focus without returning it\n\nFail = one or more UI elements takes control of keyboard focus and does not return it",
+    "automation": "partial",
+    "method": "Automatically tabs through the page dozens of times watching for a keyboard focus cycle that never returns to the browser chrome (a trap signature). Confirms candidates for manual double-check.",
+    "checks": [
+      "custom:keyboard_trap"
+    ],
+    "wcag": [
+      {
+        "sc": "2.1.2",
+        "name": "No Keyboard Trap",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-2-1",
+    "title": "Don't Use onFocus or onInput Events",
+    "category": "Quick Check",
+    "requirement": "Don't Use onFocus or onInput Events (INT-2-1)",
+    "expectation": "The onFocus and onInput events MUST not be utilized to perform any actions for the user or cause a change of context for the user that would be missed or cause confusion.",
+    "tool": "Screen Reader",
+    "procedure": "Interact with each form control and confirm that no actions take place onchange or on focus.",
+    "outcomes": "Pass = no actions are performed onChange or onFocus\n\nFail = one or more actions are performed onChange or onFocus",
+    "automation": "partial",
+    "method": "Static scan for inline onfocus=/oninput= HTML attributes. JavaScript-attached listeners (addEventListener) cannot be detected without executing every code path, so this is a partial signal only.",
+    "checks": [
+      "custom:inline_event_handlers"
+    ],
+    "wcag": [
+      {
+        "sc": "3.2.1",
+        "name": "On Focus",
+        "level": "A"
+      },
+      {
+        "sc": "3.2.2",
+        "name": "On Input",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-1-1",
+    "title": "Fully Descriptive Control Labels",
+    "category": "Quick Check",
+    "requirement": "Fully Descriptive Control Labels (INT-1-1)",
+    "expectation": "Controls and inputs MUST have one unique label attribute that fully describes the control’s purpose, including any supplementary information that the visual presentation may also provide (e.g., related controls grouped together visually).\n\nSome or all of a label MAY be hidden with CSS if the visual presentation provides the necessary context.",
+    "tool": "Screen Reader",
+    "procedure": "1) In the target page, examine each control/input element\n2) Verify that all control/input labels and instructions are announced by a screen reader\na. The label may be hidden via CSS for visual presentation\nb.Any additional instructions should appear in the accessible description.",
+    "outcomes": "Pass = all form controls have a unique label attribute that fully describes the control purpose and any supplementary information provided by the visual presentation\n\nFail = one or more form controls does not have a unique label fully describing the control purpose and any supplementary information provided by the visual presentation",
+    "automation": "partial",
+    "method": "axe-core confirms every control has a non-empty accessible name (label, aria-label, aria-labelledby). Judging whether that name is fully descriptive, including implied supplementary context, is manual.",
+    "checks": [
+      "axe:label",
+      "axe:aria-input-field-name",
+      "axe:select-name"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      },
+      {
+        "sc": "2.4.6",
+        "name": "Headings and Labels",
+        "level": "AA"
+      },
+      {
+        "sc": "3.3.2",
+        "name": "Labels or Instructions",
+        "level": "A"
+      },
+      {
+        "sc": "4.1.2",
+        "name": "Name, Role, Value",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "VIS-1-4",
+    "title": "Content Reflow",
+    "category": "Quick Check",
+    "requirement": "Content Reflow (VIS-1-4)",
+    "expectation": "When viewport size is constrained to 320 CSS pixels wide:\n\n1) There is no loss of information, meaning, or functionality and any status messages are presented in the resized viewport.\nuser is only required to scroll VERTICALLY to view or find the content\n- EXCEPT when the content requires a two-dimensional layout for meaning like tables, maps, or diagrams.\n\nWhen viewport size is constrained to 256 CSS pixels high:\n\n1) There is no loss of information, meaning, or functionality and any status messages are presented in the resized viewport.\nuser is only required to scroll HORIZONTALLY to view or find the content\n- EXCEPT when the content requires a two-dimensional layout for meaning like tables, maps, or diagrams.",
+    "tool": "System Settings",
+    "procedure": "1) Inspect the target page\n2) Activate the \"Toggle device toolbar\" button in the top left of the browser inspect panel.\n3) Use the dropdown button at the top of the page to set device width to 320px for vertically scrolling pages\n4)Examine the target page to verify that all text content is available without HORIZONTAL scrolling. Content can be displayed directly in the page, revealed via accessible controls, or accessed via direct links.\n\nOR\n\n1) Change width back to a minimum of 375, then change device HEIGHT to 256px for horizontally scrolling pages\n2) Examine the target page to verify that all text content is available without VERTICAL scrolling. Content can be displayed directly in the page, revealed via accessible controls, or accessed via direct links.\nException: Horizontal scrolling is allowed for the following content:\n-Data tables`\n-Photos\n-Maps\n-Charts\n-Games\n-UI with toolbars",
+    "outcomes": "Pass = there is not a loss of information, meaning, or functionality and only one scroll dimension is required\n\nFail = there is a loss of information, meaning, or functionality OR vertical and horizontal scrolling are required to view the content\n\nNA = content is any of the following:\n-Data tables\n-Photos\n-Maps\n-Charts\n-Games\n-UI with toolbars",
+    "automation": "partial",
+    "method": "Playwright resizes the viewport to 320 CSS px wide and 256 CSS px high and checks scrollWidth/scrollHeight for the corresponding forced scroll direction. Content-type exceptions (tables, maps, etc.) require human judgment.",
+    "checks": [
+      "custom:reflow"
+    ],
+    "wcag": [
+      {
+        "sc": "1.4.10",
+        "name": "Reflow",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "NAV-3-2",
+    "title": "Keep All Content in Appropriate Regions",
+    "category": "Quick Check",
+    "requirement": "Keep All Content in Appropriate Regions (NAV-3-2)",
+    "expectation": "All rendered content MUST be within the appropriate landmark region AND the Main landmark MUST contain all of the primary page content AND no blocks of content that repeat on multiple pages are within the Main landmark.",
+    "tool": "Accessibility Insights",
+    "procedure": "Using the Accessibility Insights Landmarks tool, examine the landmark regions in the page and confirm that: \n1) All page content is within a landmark region\n2) All primary page content is within the Main landmark region\n3) No content that repeats on multiple pages is within the Main landmark region",
+    "outcomes": "Pass = all page content is within the appropriate landmark region\n\nFail = one or more blocks of page content are not within a landmark region OR the Main landmark region does not include all primary page content OR content that repeats on multiple pages is within the Main landmark region",
+    "automation": "partial",
+    "method": "axe-core's region rule flags rendered content that falls outside any landmark. Confirming the Main landmark holds only primary content (and no repeated boilerplate) is manual.",
+    "checks": [
+      "axe:region"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      },
+      {
+        "sc": "2.4.1",
+        "name": "Bypass Blocks",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "NAV-3-3",
+    "title": "Redundant Landmarks Have Unique Names",
+    "category": "Quick Check",
+    "requirement": "Redundant Landmarks Have Unique Names (NAV-3-3)",
+    "expectation": "If a page has multiple landmarks of the same type (e.g., Main Nav and Sub Nav), those regions MUST have unique names applied using an appropriate naming technique AND the landmark role type Must not be included in the name. ",
+    "tool": "Accessibility Insights",
+    "procedure": "1) Use Accessibility Insights>Adhoc Tools>Landmarks to review all of the landmark roles in the page\n2) Locate any instance of two or more landmarks of the same type (e.g., Main Nav and Sub Nav)\n3) Confirm that each duplicate landmark has a unique name that does not include the landmark role type in the name to help screen reader users distinguish between the two.",
+    "outcomes": "Pass = all landmark regions of the same role type have unique names applied AND the name for each does not include the role type\n\nFail = two or more landmark roles of the same type are present AND they do not have unique names applied OR the name of one or more region includes the role type in the name value\n\nNA = no landmark regions of the same role type are present",
+    "automation": "automated",
+    "method": "axe-core's landmark-unique rule flags duplicate-role landmarks that share the same accessible name.",
+    "checks": [
+      "axe:landmark-unique"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      },
+      {
+        "sc": "2.4.1",
+        "name": "Bypass Blocks",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-5-7",
+    "title": "Name, Role, Value",
+    "category": "Quick Check",
+    "requirement": "Name, Role, Value (INT-5-7)",
+    "expectation": "All controls MUST fully describe accessibility information to assistive technology (e.g. name, role, state, value, and properties).",
+    "tool": "Screen Reader",
+    "procedure": "Interact with each control using a screen reader. Confirm that each control properly announces appropriate name, role, state, values, and properties.",
+    "outcomes": "Pass = all controls announce their appropriate name, role, state, values, and properties\n\n\nFail = one or more controls does not announce the appropriate name, role, state, value, or property",
+    "automation": "automated",
+    "method": "axe-core's broad ARIA rule set validates name, role, state and value for interactive controls (buttons, links, form fields, custom widgets). Expand/collapse controls and submenu triggers are also activated from the keyboard to confirm aria-expanded is present and actually flips to match whether the controlled content is shown.",
+    "checks": [
+      "axe:button-name",
+      "axe:link-name",
+      "axe:aria-*",
+      "custom:disclosure_toggle",
+      "custom:menu_keyboard"
+    ],
+    "wcag": [
+      {
+        "sc": "4.1.2",
+        "name": "Name, Role, Value",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "VIS-2-3",
+    "title": "Support High Contrast",
+    "category": "Quick Check",
+    "requirement": "Support High Contrast (VIS-2-3)",
+    "expectation": "All content adapts and supports the user's high contrast mode settings",
+    "tool": "System Settings",
+    "procedure": "Windows: Use the search feature to search for High Contrast Mode. Activate High Contrast Mode from the settings window.\n\nMac: Go to System Preferences>Accessibility>Display>Invert Colors.",
+    "outcomes": "Pass = all content supports high contrast mode\n\nFail = some content does not support high contrast mode",
+    "automation": "manual",
+    "method": "Requires toggling an OS-level high-contrast/inverted-colors mode and visually confirming every element still renders legibly — not observable from the page DOM.",
+    "checks": [],
+    "wcag": []
+  },
+  {
+    "id": "GEN-1-2",
+    "title": "Unique Title",
+    "category": "Full Audit",
+    "requirement": "Unique Title (GEN-1-2)",
+    "expectation": "The page title MUST be unique and conform to a consistent structure among the other pages.",
+    "tool": "ANDI",
+    "procedure": "Verify that the page title is unique and conforms to a consistent structure among the other pages.",
+    "outcomes": "Pass = page title is unique and conforms to a consistent structure among the other pages\n\nFail = page title is not unique and/or it does not conform to a consistent structure among the other pages.",
+    "automation": "partial",
+    "method": "In batch/crawl mode, page titles across the audited set are compared for exact duplicates and for a consistent naming pattern (e.g. shared \" | Site Name\" suffix). Not applicable to a single-page audit.",
+    "checks": [
+      "custom:batch_title_consistency"
+    ],
+    "wcag": [
+      {
+        "sc": "2.4.2",
+        "name": "Page Titled",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "GEN-2-1",
+    "title": "Lang Attribute",
+    "category": "Full Audit",
+    "requirement": "Lang Attribute (GEN-2-1)",
+    "expectation": "The applicable language MUST be defined on every page, inside the html tag.",
+    "tool": "ANDI",
+    "procedure": "1) Use ANDI>Structures>More Details>Page Language or use the Inspect feature in the browser (e.g. Chrome F12 dev tools) to open a view of the page HTML code\n2) Locate the <html> element at the beginning of the HTML DOM\n3) Confirm that the lang=\"\" attribute is correct for the language of the page content",
+    "outcomes": "Pass = correct page language is defined\n\nFail = page language is not defined or the incorrect page language is defined",
+    "automation": "automated",
+    "method": "axe-core validates that <html lang> is present and set to a recognized language subtag.",
+    "checks": [
+      "axe:html-has-lang",
+      "axe:html-lang-valid",
+      "axe:html-xml-lang-mismatch"
+    ],
+    "wcag": [
+      {
+        "sc": "3.1.1",
+        "name": "Language of Page",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "GEN-2-2",
+    "title": "Lang of Parts of Page",
+    "category": "Full Audit",
+    "requirement": "Lang of Parts of Page (GEN-2-2)",
+    "expectation": "A lang attribute MUST be set on every word or phrase that is in a different language than the page’s main language.",
+    "tool": "Browser - Inspect Code",
+    "procedure": "1) Locate any words or phrases in the page content that are in a language that is different from the language of the other content in the page. \n2) Use the Inspect feature in the browser (e.g. Chrome F12 dev tools) to open a view of the page HTML code and inspect each of these words or phrases.\n3) Confirm that each of these words or phrases is wrapped in a <span> element with a lang=\"\" attribute that is correct for the language of the word or phrase.",
+    "outcomes": "Pass = all words or pages which are in a different language than the global lang are marked up with the appropriate language\n\nFail = words or pages which are in a different language than the global lang are not marked up with the appropriate language\n\nNA = no words or phrases are in a different language from the global language",
+    "automation": "manual",
+    "method": "Detecting a foreign-language phrase within otherwise same-language content requires natural-language understanding of the page's prose, not structural analysis.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "3.1.2",
+        "name": "Language of Parts",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "GEN-3-1",
+    "title": "Support Screen Readers",
+    "category": "Full Audit",
+    "requirement": "Support Screen Readers (GEN-3-1)",
+    "expectation": "All features and functionality made available to users within the web application MUST be functionally supported with at least one screen reader per supported platform (i.e. JAWS for Windows desktop, VoiceOver for iOS, etc.). ",
+    "tool": "Screen Reader",
+    "procedure": "Run through all use cases with each supported screen reader, confirming that all features and functionality are fully available to non-sighted users.",
+    "outcomes": "Pass = all features and functionality are fully available to non-sighted users\n\nFail = one ore more features or functionality are not fully available to non-sighted users",
+    "automation": "manual",
+    "method": "Requires operating every feature and use case with a real screen reader (JAWS/VoiceOver/NVDA) to confirm functional parity.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      },
+      {
+        "sc": "4.1.2",
+        "name": "Name, Role, Value",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "GEN-3-2",
+    "title": "Alerts Read",
+    "category": "Full Audit",
+    "requirement": "Alerts Read (GEN-3-2)",
+    "expectation": "When alerts are shown on screen (i.e., success, error, or status/informative) they MUST also be read aloud by each supported screen reader without receiving focus.",
+    "tool": "Screen Reader",
+    "procedure": "Confirm that when alerts are shown on screen (i.e., success, error, or status/informative) they are also read aloud by each supported screen reader. ",
+    "outcomes": "Pass = alerts shown on screen are read aloud by each supported screen reader\n\nFail = alerts shown on screen are not read aloud by each supported screen reader\n\nNA = no alerts are shown on screen",
+    "automation": "partial",
+    "method": "Confirms structurally that alert/status containers exist (role=\"alert\"/\"status\" or aria-live) near where alerts are shown. Whether they are actually announced by a screen reader when triggered requires live AT testing.",
+    "checks": [
+      "custom:live_region_presence"
+    ],
+    "wcag": [
+      {
+        "sc": "4.1.3",
+        "name": "Status Messages",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "GEN-3-3",
+    "title": "Screen Updates Read",
+    "category": "Full Audit",
+    "requirement": "Screen Updates Read (GEN-3-3)",
+    "expectation": "When the user takes an action resulting in a visual change to the screen above the focus (e.g., user entered a Visa card number and the Visa logo above the input highlights onblur), each supported screen reader MUST inform the user of this change.",
+    "tool": "Screen Reader",
+    "procedure": "When the user takes an action resulting in a visual change to the screen above the focus (e.g., user entered a Visa card number and the Visa logo above the input highlights onblur), each supported screen reader announces the change to the user.",
+    "outcomes": "Pass = visual changes to the screen above the focus are announced to the user\n\nFail = visual changes to the screen above the focus are not announced to the user\n\nNA = visual changes above the focus do not occur",
+    "automation": "manual",
+    "method": "Confirming a screen reader announces a visual change above the current focus point requires live assistive-technology testing during the triggering interaction.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "4.1.3",
+        "name": "Status Messages",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "GEN-3-4",
+    "title": "Hide from Sighted Users",
+    "category": "Full Audit",
+    "requirement": "Hide from Sighted Users (GEN-3-4)",
+    "expectation": "To hide content from sighted users (but not screen readers) the content MUST be moved off-screen using CSS.\n\n for example: \n .hide-visually-but-not-from-screen readers {\n  position: absolute;\n  top: -9999px !important;\n  left: -9999px !important;\n  }",
+    "tool": "Screen Reader",
+    "procedure": "Run through the page with a screen reader, confirm that content included for screen readers but to be hidden visually (e.g., hidden Headings to provide content structure that is visually implied) is reading for screen readers but not onscreen.",
+    "outcomes": "Pass = screen reader only content is read by the screen reader but hidden visually\n\nFail = screen reader only content is EITHER not read by the screen reader OR it is read by screen reader but not hidden visually\n\nNA = no screen reader only content is present",
+    "automation": "partial",
+    "method": "Flags visually-hidden text implemented with display:none or visibility:hidden (which also hides it from screen readers) instead of an off-screen clipping technique, which is the specific anti-pattern this requirement guards against.",
+    "checks": [
+      "custom:visually_hidden_technique"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "GEN-3-5",
+    "title": "Hide from Screen Readers",
+    "category": "Full Audit",
+    "requirement": "Hide from Screen Readers (GEN-3-5)",
+    "expectation": "To hide content from screen readers (but not sighted users) the following attributes MUST be used: \n• aria-hidden=\"true\"\n• Set the tabindex=\"-1\"",
+    "tool": "Screen Reader",
+    "procedure": "Run through the page with a screen reader, confirm that content that SHOULD be hidden from screen readers (but not sighted users) is shown on screen but not showing up for screen readers.",
+    "outcomes": "Pass = content intentionally hidden from screen reader is not read by the screen reader AND is shown visually\n\nFail = content intentionally hidden from screen reader is read by the screen reader\n\nNA = no content is intentionally hidden from screen reader",
+    "automation": "partial",
+    "method": "axe-core's aria-hidden-focus rule catches the most common failure mode: a focusable element nested inside an aria-hidden=\"true\" container. Confirming intended content is fully excluded from the accessibility tree still benefits from screen reader spot-checks.",
+    "checks": [
+      "axe:aria-hidden-focus",
+      "axe:aria-hidden-body"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      },
+      {
+        "sc": "4.1.2",
+        "name": "Name, Role, Value",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-1-2",
+    "title": "Group Controls Using Fieldsets",
+    "category": "Full Audit",
+    "requirement": "Group Controls Using Fieldsets (INT-1-2)",
+    "expectation": "If there is more than one distinct group of related form controls on a page, the related controls MUST be grouped programmatically. This may be done using either fieldset/legend or ARIA group role/text container. Text describing the logical grouping MAY be hidden off-screen if it isn't visually necessary.",
+    "tool": "Screen Reader",
+    "procedure": "If fieldsets or aria groups are used on the page to group more than one distinct group of related form controls, confirm that the legends/ARIA legends read properly, i.e., before each label for the controls in the given group.",
+    "outcomes": "Pass = related controls are grouped using Fieldset OR ARIA group AND the legend/ARIA legend is read correctly by screen reader\n\nFail = related controls are not grouped using Fieldset OR ARIA group OR they are but the legend/ARIA legend is read incorrectly or not read by the screen reader\n\nNA = no groups of related controls are present",
+    "automation": "partial",
+    "method": "Detects groups of 2+ same-name radio/checkbox inputs that are not wrapped in a <fieldset> or an ARIA group role. Confirming the legend/group label is announced correctly in the intended reading position requires a screen reader.",
+    "checks": [
+      "custom:fieldset_grouping"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      },
+      {
+        "sc": "3.3.2",
+        "name": "Labels or Instructions",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-1-3",
+    "title": "Required Fields",
+    "category": "Full Audit",
+    "requirement": "Required Fields (INT-1-3)",
+    "expectation": "Required fields/controls MUST use the aria-required=\"true\" attribute. They MUST also be communicated in text either at the beginning of the form or in-line.\n\nGroups of checkboxes SHOULD not have the aria-required attribute and the required state should be indicated in text either at the beginning of the form, stating all fields are required, or in the group's fieldset legend instead.",
+    "tool": "Screen Reader",
+    "procedure": "1) Ensure that required fields are identified visually with text at the beginning of the form or in-line.\n\n2) Tab through each control on the page and confirm that each required form control is announced as such by each supported screen reader.",
+    "outcomes": "Pass = all required fields are marked with aria-required=\"true\" and read correctly by a screen reader AND text is available at the top of the form or in-line\n\nFail = one or more required field is not marked with aria-required=\"true\" and read correctly by a screen reader OR text is not available at the top of the form or in-line.\n\nNA = no required fields are present",
+    "automation": "partial",
+    "method": "Cross-checks the required/aria-required=\"true\" attribute against visible \"required\" indicator text near the field or at the top of the form.",
+    "checks": [
+      "custom:required_fields"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      },
+      {
+        "sc": "3.3.2",
+        "name": "Labels or Instructions",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-1-4",
+    "title": "Use aria-describedby",
+    "category": "Full Audit",
+    "requirement": "Use aria-describedby (INT-1-4)",
+    "expectation": "Helper text MUST be programmatically associated with a form control using aria-describedby=\"<ID of helper texts container>\".",
+    "tool": "Screen Reader",
+    "procedure": "Tab through each control on the page and confirm that helper text is read after the label for each form control that has helper text.",
+    "outcomes": "Pass = all helper text is associated correctly and read by the screen reader as expected\n\nFail = one or more helper text instances are not associated correctly OR read by the screen reader as expected\n\nNA = no helper text is present",
+    "automation": "partial",
+    "method": "Confirms every aria-describedby reference resolves to an existing element near the control (structural correctness). Confirming a screen reader reads that text immediately after the label still requires live AT testing.",
+    "checks": [
+      "custom:describedby_wiring"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      },
+      {
+        "sc": "3.3.2",
+        "name": "Labels or Instructions",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-1-5",
+    "title": "Specify Input Purpose Programmatically",
+    "category": "Full Audit",
+    "requirement": "Specify Input Purpose Programmatically (INT-1-5)",
+    "expectation": "If an input field is used to collect information about the user and the field supports autocomplete then the input field's purpose is identified programmatically.",
+    "tool": "Browser - Inspect Code",
+    "procedure": "1) Use the Browser inspection to inspect each input field on the page. to determine if the HTML atutocomplete or autofill attributes have been used.\n2) If these attributes have been used, then they must match the type of information requested from the user.",
+    "outcomes": "Pass = there are no automated errors reported and all fields which have autocomplete or autofill defined have correct, valid values that match the requested information\n\nFail = one or more fields are detected which have incorrect or invalid values for autocomplete or autofill or the specified values do not match the information requested from the user.\n\nNA = no fields with autocomplete or autofill are present ",
+    "automation": "partial",
+    "method": "axe-core validates that any autocomplete token used is well-formed; a heuristic then compares the token against the field's name/id/label text (e.g. an email-looking field should carry autocomplete=\"email\").",
+    "checks": [
+      "axe:autocomplete-valid",
+      "custom:autocomplete_purpose"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.5",
+        "name": "Identify Input Purpose",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "INT-1-6",
+    "title": "Visible and Programmatic Label Consistency",
+    "category": "Full Audit",
+    "requirement": "Visible and Programmatic Label Consistency (INT-1-6)",
+    "expectation": "If a control's visual label differs from the programmatic/accessible name value, then the programmatic/accessible name value includes the visual label.",
+    "tool": "ANDI",
+    "procedure": "1) Use the ANDI tool and select Buttons/Links from the dropdown menu.\n2) Use the ANDI Output section to determine whether or not any controls have a programmatic/accessible name value that is different from the visual label.\n3) For any control that has a different visual label and ANDI output, confirm that the programmatic/accessible name value includes the visual label.\n4) Repeat these steps using the ANDI Focusable Elements dropdown to review form fields.",
+    "outcomes": "Pass = all controls which have a different programmatic/accessible name value and visual label have the visual label text within the programmatic/accessible name value text string\n\nFail = one or more control which has a different programmatic/accessible name value and visual label does not have the visual label text within the programmatic/accessible name value text string\n\nNA = no controls which have a different programmatic/accessible name value and visual label are present",
+    "automation": "automated",
+    "method": "axe-core's label-content-name-mismatch rule flags any control whose accessible name doesn't contain its visible label text.",
+    "checks": [
+      "axe:label-content-name-mismatch"
+    ],
+    "wcag": [
+      {
+        "sc": "2.5.3",
+        "name": "Label in Name",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-1-7",
+    "title": "Multiple Authentication Methods",
+    "category": "Full Audit",
+    "requirement": "Multiple Authentication Methods (INT-1-7)",
+    "expectation": "User authentication must avoid relying on a cognitive function test by providing multiple means of filling in authentication information.",
+    "tool": "Visual Inspection",
+    "procedure": "Ensure that authentication form fields allow any of the following:\n-The fields allow autofill of information provided by the browser.\n-Information may be pasted into the form fields.\n-Biometrics can be used to sign into accounts",
+    "outcomes": "Pass: The authentication fields allow autofill of stored information from the browser OR information can be copied and pasted into the fields OR biometrics (fingerprints, facial-scan, etc.) can be used to log in.\n\nFail: The authentication fields do not allow autofill AND information cannot be copied and pasted into the fields AND biometrics cannot be used (i.e. none of the pass criteria methods are used). \n\nNA: the page does not require interaction to authenticate",
+    "automation": "partial",
+    "method": "Checks that authentication fields carry autocomplete attributes (enabling password-manager autofill) and are not blocked from paste via onpaste handlers. Biometric sign-in availability is a device/OS capability outside what a page audit can observe.",
+    "checks": [
+      "custom:auth_field_methods"
+    ],
+    "wcag": [
+      {
+        "sc": "3.3.8",
+        "name": "Accessible Authentication (Minimum)",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "INT-2-2",
+    "title": "Use “Go” Buttons",
+    "category": "Full Audit",
+    "requirement": "Use “Go” Buttons (INT-2-2)",
+    "expectation": "The onBlur event MUST not be used to perform any user action, unless deemed absolutely necessary.  A \"go\" button is always the preferred approach in this instance.",
+    "tool": "Screen Reader",
+    "procedure": "Interact with each form control and confirm that no actions take place on blur (rather they require a go button) unless this is absolutely necessary.",
+    "outcomes": "Pass = no UI changes occur onBlur unless they are passing INT-2-3\n\nFail = one or more UI changes occur onBlur and INT-2-3 also fails ",
+    "automation": "partial",
+    "method": "Static scan for inline onblur= handlers, which is the specific pattern this requirement discourages in favor of an explicit \"Go\" button. Determining if the resulting behavior is \"significant\" is a judgment call.",
+    "checks": [
+      "custom:inline_event_handlers"
+    ],
+    "wcag": [
+      {
+        "sc": "3.2.2",
+        "name": "On Input",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-2-3",
+    "title": "Warn Users in Text and With describedby",
+    "category": "Full Audit",
+    "requirement": "Warn Users in Text and With describedby (INT-2-3)",
+    "expectation": "If an onBlur event MUST be used to cause a \"significant\" change to a page, the page MUST:\n\n1) Describe what will happen via a textual description to the user prior the control being triggered, and\n2) aria-describedby=\"<ID OF CONTAINER OF THAT TEXT>\" MUST be included within the control to ensure the screen reader users will receive the message.",
+    "tool": "Screen Reader",
+    "procedure": "Interact with each form control that uses an on blur event to cause a \"significant\" change to a page, the page visually describes what will happen via a textual description to the user prior the control being triggered, and that description is also read to the user after the label, on focus.",
+    "outcomes": "Pass = UI changes occur onBlur causing significant change to the page visually and the user is made aware of this change\n\nFail = UI changes occur onBlur causing significant change to the page visually and the user is not made aware of this change and INT-2-3 also fails",
+    "automation": "partial",
+    "method": "Where an onblur handler is present, checks whether a related aria-describedby-wired warning text exists near the control. Confirming it visually describes the outcome and is read on focus requires manual/AT confirmation.",
+    "checks": [
+      "custom:inline_event_handlers",
+      "custom:describedby_wiring"
+    ],
+    "wcag": [
+      {
+        "sc": "3.2.2",
+        "name": "On Input",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-2-4",
+    "title": "Activate Only on Up Event",
+    "category": "Full Audit",
+    "requirement": "Activate Only on Up Event (INT-2-4)",
+    "expectation": "Actions completed with mouse or touch input MUST not use the down-event to execute any part of the function.\n-OR-\nMake sure there is a way for the user to abort or undo the action.\n-OR-\nAllow the up-event to reverse any outcome of the preceding down-event",
+    "tool": "Mouse",
+    "procedure": "Confirm that there are no actions which are completed using the down-event from mouse or touch input OR that there is a way for the user to abort or undo the action OR that the up-event allows the user to reverse any outcome of the preceding down-event.",
+    "outcomes": "Pass = no actions are completed using the down event OR there is a way to abort or undo an action completed on the down-event OR the up-event allows the reversal of the preceding down-event\n\nFail = actions are completed using the down event AND there is not a way to abort or undo the action AND the up-event does not allow reversal of the preceding down-event",
+    "automation": "partial",
+    "method": "Static scan for inline onmousedown= handlers as a proxy for down-event-triggered actions. JavaScript-attached mousedown listeners aren't visible without executing every code path, so a manual pass on interactive components is still recommended.",
+    "checks": [
+      "custom:inline_event_handlers"
+    ],
+    "wcag": [
+      {
+        "sc": "2.5.2",
+        "name": "Pointer Cancellation",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-2-5",
+    "title": "Redundant Entry",
+    "category": "Full Audit",
+    "requirement": "Redundant Entry (INT-2-5)",
+    "expectation": "If a page is contained within a process then information provided on the first step of the process is auto-filled in the next steps unless the information is required for security.",
+    "tool": "Visual Inspection",
+    "procedure": "Review the page to determine if it is a step in a process. Ensure that if information is provided in an earlier step in this process, that information is auto-filled in later steps.\n",
+    "outcomes": "Pass: Information provided during the process will autofill if later steps require the same information.\n\nFail: Fields do not autofill when the same information has been provided on previous steps.\n\nNA: The page does not contain any process-based functionality OR information reentry is essential or required for security.",
+    "automation": "manual",
+    "method": "Whether a multi-step process re-uses previously entered information is a business-logic/state question that requires walking through the real transaction flow.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "3.3.7",
+        "name": "Redundant Entry",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-3-5",
+    "title": "In-Line Error Messaging for Screen Reader",
+    "category": "Full Audit",
+    "requirement": "In-Line Error Messaging for Screen Reader (INT-3-5)",
+    "expectation": "When an error is detected using in-line validation, any previous role=\"alert\" instances MUST be removed from the DOM, and role=\"alert\" MUST be set on the container of the error_helpertext.",
+    "tool": "Screen Reader",
+    "procedure": "Enter invalid data in a form field.\n\nUse the screen reader to navigate away from the field and confirm that after navigating away from the field aria-invalid=\"true\" is added to the field and error helper text is associated using aria-describedby and this information is announced by the screen reader",
+    "outcomes": "Pass = for all in-line validated fields with invalid information the screen reader announces the field as invalid and the helper text when the field receives focus\n\nFail = for all in-line validated fields with invalid information the screen reader does not announce the field as invalid OR the helper text when the field receives focus\n\nNA = no forms are present",
+    "automation": "partial",
+    "method": "Statically confirms role=\"alert\" containers and aria-describedby wiring exist around form fields. Confirming stale alerts are removed and new ones announced on live validation requires screen reader testing.",
+    "checks": [
+      "custom:describedby_wiring",
+      "custom:live_region_presence"
+    ],
+    "wcag": [
+      {
+        "sc": "3.3.1",
+        "name": "Error Identification",
+        "level": "A"
+      },
+      {
+        "sc": "4.1.3",
+        "name": "Status Messages",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "INT-3-3",
+    "title": "Use aria-invalid",
+    "category": "Full Audit",
+    "requirement": "Use aria-invalid (INT-3-3)",
+    "expectation": "The aria-invalid attribute MUST be managed programmatically, when an error is being detected aria-invalid MUST be set to true. Controls that are being validated for errors MUST include aria-invalid=\"true\" inside the <input> field when an error is present.",
+    "tool": "Screen Reader",
+    "procedure": "Tab through each control on the page and confirm that no form controls announce as invalid if they are not invalid.",
+    "outcomes": "Pass = aria-invalid is implemented correctly and invalid fields are announced correctly by the screen reader\n\nFail = aria-invalid is not implemented correctly OR invalid fields are not announced correctly by the screen reader\n\nNA = no forms are present",
+    "automation": "partial",
+    "method": "axe validates that any aria-invalid value used is well-formed. The scan deliberately does not submit forms on the live page (to avoid triggering real transactions), so confirming aria-invalid is set correctly at the moment an error actually occurs requires a manual pass.",
+    "checks": [
+      "axe:aria-valid-attr-value",
+      "custom:form_structure"
+    ],
+    "wcag": [
+      {
+        "sc": "3.3.1",
+        "name": "Error Identification",
+        "level": "A"
+      },
+      {
+        "sc": "4.1.2",
+        "name": "Name, Role, Value",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-3-6",
+    "title": "In-Line Error Validation for Screen Reader",
+    "category": "Full Audit",
+    "requirement": "In-Line Error Validation for Screen Reader (INT-3-6)",
+    "expectation": "When an error is detected using client side validation the following MUST be programmatically accommodated:\n\n1. set aria-invalid=\"true\"\n2. add the ID of the error helper text container to the aria-describedby attribute if present or add an aria-describedby attribute if not \n\nExample: aria-describedby=\"helpertext\" changes to aria-describedby=\"error_helpertext helpertext\".",
+    "tool": "Screen Reader",
+    "procedure": "Fill out all client-side validated form controls with invalid data, return to the top of the form, and tab through all invalid form controls with each screen reader and confirm that on focus, invalid form controls are announced as such and that the text of the error helper text is read aloud.",
+    "outcomes": "Pass = when an invalid field is encountered with a screen reader it is announced as invalid and error helper text is read aloud\n\nFail = when an invalid field is encountered with a screen reader it is not announced as invalid and/or error helper text is read aloud\n\nNA = no forms are present",
+    "automation": "partial",
+    "method": "Statically checks that client-side-validated forms have an error-message container wired up (role=\"alert\"/aria-live, referenced via aria-describedby) ready to receive validation errors. The scan does not submit forms on the live page, so confirming the live announcement on an actual invalid entry requires a manual pass.",
+    "checks": [
+      "custom:form_structure"
+    ],
+    "wcag": [
+      {
+        "sc": "3.3.1",
+        "name": "Error Identification",
+        "level": "A"
+      },
+      {
+        "sc": "3.3.3",
+        "name": "Error Suggestion",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "INT-3-1",
+    "title": "Check for Errors",
+    "category": "Full Audit",
+    "requirement": "Check for Errors (INT-3-1)",
+    "expectation": "All pages that accept user input MUST check for errors and allow the user to correct them through validation in-line and post-submit as detailed in INT-3-2 through INT-3-6.\n\nWhere users are prevented from submitting a form with errors, in-line validation is required but post-submit validation is not. Where users are able to submit a form with errors, post-submit validation is required.",
+    "tool": "Visual Inspection",
+    "procedure": "Confirm that if a page accepts user input it also checks for errors and allows the user to correct them.",
+    "outcomes": "Pass = validation is used to find errors in user input\n\nFail = validation is not used to find errors in user input\n\nNA = no forms collecting user input are present",
+    "automation": "partial",
+    "method": "Statically confirms that forms collecting required input have client-side validation scaffolding in place (no unconditional novalidate, an error-message container present). The scan does not submit forms on the live page (to avoid triggering real transactions), so confirming errors actually surface on invalid input requires a manual pass.",
+    "checks": [
+      "custom:form_structure"
+    ],
+    "wcag": [
+      {
+        "sc": "3.3.1",
+        "name": "Error Identification",
+        "level": "A"
+      },
+      {
+        "sc": "3.3.3",
+        "name": "Error Suggestion",
+        "level": "AA"
+      },
+      {
+        "sc": "3.3.4",
+        "name": "Error Prevention (Legal, Financial, Data)",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "INT-3-2",
+    "title": "Summary Before Submit",
+    "category": "Full Audit",
+    "requirement": "Summary Before Submit (INT-3-2)",
+    "expectation": "If user input is collected across multiple pages in order to execute a transaction of some kind the user MUST be presented with a summary of the input before submitting. The user MUST be able to change input prior to final submission after reviewing.",
+    "tool": "Visual Inspection",
+    "procedure": "Examine the target page to determine whether it allows users to:\n\nmake any legal commitments or financial transactions, or\n\nmodify or delete data in a data storage system, or\n\nSubmit test responses.\n\nIf the page does allow such actions, verify that the following are true:\n\nthe user is presented with a summary of the input before submitting\n\nuser can review, confirm, and correct information before finalizing the submission",
+    "outcomes": "Pass = a summary of user input is provided prior to final submit AND the user can edit or make corrections as needed\n\nFail = a summary of user input is not provided prior to final submit OR the user cannot edit or make corrections as needed\n\nNA = user input is not collected across pages to execute a transaction",
+    "automation": "manual",
+    "method": "Whether a multi-page transaction shows a pre-submit summary is a UX/business-flow question that requires walking the real transaction end to end.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "3.3.4",
+        "name": "Error Prevention (Legal, Financial, Data)",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "INT-3-4",
+    "title": "Highlight In-Line Errors Visually",
+    "category": "Full Audit",
+    "requirement": "Highlight In-Line Errors Visually (INT-3-4)",
+    "expectation": "When an error is detected using in-line validation, highlight the field (e.g., with a bold red border, error icon with proper alternative text) and place error helper text near it.",
+    "tool": "Visual Inspection",
+    "procedure": "Confirm that when an error is detected using in-line validation, the visual UI highlights the fields with errors (e.g., with a red border) and places error helper text above or below each one.",
+    "outcomes": "Pass = when an error is detected using in-line validation, the visual UI highlights the field and places error helper text near it\n\nFail = for one or more client-side validated forms when an error is detected using client side validation, the visual UI does not highlight the field or place error helper text near it\n\nNA = no forms are present",
+    "automation": "partial",
+    "method": "Statically confirms an error-message container exists near required fields, ready to be styled/positioned as a highlight when validation runs. The scan does not submit forms on the live page, so confirming the actual visual highlight on error requires a manual pass.",
+    "checks": [
+      "custom:form_structure"
+    ],
+    "wcag": [
+      {
+        "sc": "3.3.1",
+        "name": "Error Identification",
+        "level": "A"
+      },
+      {
+        "sc": "1.4.1",
+        "name": "Use of Color",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-4-1",
+    "title": "Modal Dialog ARIA Usage",
+    "category": "Full Audit",
+    "requirement": "Modal Dialog ARIA Usage (INT-4-1)",
+    "expectation": "Modal dialog windows MUST have the role attribute on the modal container set to role=“dialog” AND the attribute aria-modal=\"true\".",
+    "tool": "Screen Reader",
+    "procedure": "Confirm that when a modal dialog opens that the screen reader announces it as a dialog.",
+    "outcomes": "Pass = the modal dialog container has the role=\"dialog\" and aria-modal=\"true\" attributes and the modal dialog is announced as a dialog by the screen reader\n\nFail = the modal dialog container does not have a role=\"dialog\" and the modal dialog is not announced as a dialog by the screen reader OR the container is missing the aria-modal=\"true\" attribute.\n\nNA = no modal dialog is present",
+    "automation": "partial",
+    "method": "Every element in the DOM carrying role=\"dialog\"/\"alertdialog\" (even ones hidden until triggered) is checked for the required aria-modal=\"true\" attribute. Dialogs that are constructed dynamically purely in JS after a specific interaction may be missed.",
+    "checks": [
+      "custom:modal_static_aria"
+    ],
+    "wcag": [
+      {
+        "sc": "4.1.2",
+        "name": "Name, Role, Value",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-4-2",
+    "title": "Modal Dialogs Have Titles",
+    "category": "Full Audit",
+    "requirement": "Modal Dialogs Have Titles (INT-4-2)",
+    "expectation": "Modal dialogs MUST have aria-labelledby=\"id of dialog-title\" where dialog-title would be the modal dialog's title (e.g., main heading in modal dialog).",
+    "tool": "Screen Reader",
+    "procedure": "Confirm that when a modal dialog pops up, the modal dialog's main heading or title is read aloud to the user.",
+    "outcomes": "Pass = when a modal dialog pops up the main heading or title is read by the screen reader\n\nFail = when a modal dialog pops up the main heading or title is not read by the screen reader\n\nNA = no modal dialog is present",
+    "automation": "partial",
+    "method": "Checks that each detected dialog element has an aria-labelledby attribute pointing to an existing element.",
+    "checks": [
+      "custom:modal_static_aria"
+    ],
+    "wcag": [
+      {
+        "sc": "4.1.2",
+        "name": "Name, Role, Value",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-4-3",
+    "title": "Modal Dialogs Have Descriptions",
+    "category": "Full Audit",
+    "requirement": "Modal Dialogs Have Descriptions (INT-4-3)",
+    "expectation": "Modal dialogs SHOULD have aria-describedby=\"dialog-desc\" where dialog-desc is some helpful information that is above the first focusable element.",
+    "tool": "Screen Reader",
+    "procedure": "Confirm that when a modal dialog pops up, any helpful information that is above the first focusable element is read aloud after the modal dialog's main heading or title.",
+    "outcomes": "Pass = when a modal dialog pops up, any helpful information that is above the first focusable element is read aloud after the modal dialog's main heading or title\n\nFail = when a modal dialog pops up, any helpful information that is above the first focusable element is not read aloud after the modal dialog's main heading or title.\n\nNA = no modal dialog is present OR modal dialogs do not have helpful information that is above the first focusable element",
+    "automation": "partial",
+    "method": "Checks whether each detected dialog element has an aria-describedby attribute pointing to an existing element (this attribute is a SHOULD, not a MUST).",
+    "checks": [
+      "custom:modal_static_aria"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-4-4",
+    "title": "Modal Dialogs Trap Focus",
+    "category": "Full Audit",
+    "requirement": "Modal Dialogs Trap Focus (INT-4-4)",
+    "expectation": "Modal dialogs MUST trap focus inside the modal dialog.",
+    "tool": "Screen Reader",
+    "procedure": "Confirm that focus is trapped inside all modal dialogs by cycling through headings, landmark roles, and links with each supported screen reader and confirming that focus stays within the modal dialog and doesn't move the screen behind.",
+    "outcomes": "Pass = screen reader focus is trapped inside the modal dialog and only elements which are inside the modal dialog are exposed to the screen reader\n\nFail = screen reader focus is not trapped inside the modal dialog OR elements which are outside the modal dialog are exposed to the screen reader\n\nNA = no modal dialog is present",
+    "automation": "manual",
+    "method": "Confirming keyboard focus is trapped requires actually opening the dialog via its real trigger interaction and tabbing through it live.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "2.4.3",
+        "name": "Focus Order",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-4-5",
+    "title": "Modal Dialogs Set Focus",
+    "category": "Full Audit",
+    "requirement": "Modal Dialogs Set Focus (INT-4-5)",
+    "expectation": "Modal dialogs MUST have focus set to an appropriate location based on the content presented in the modal dialog.\n\nWhere to Place Focus:\n- If modal dialog has form fields place focus in first field\n- If modal dialog is text only with multiple paragraphs action buttons below the text place focus on the first paragraph or heading\n- If modal dialog is text only with a small amount of text (e.g. a few sentences) with action buttons place focus on the first button\n- Initial focus may also be set to the modal dialog container",
+    "tool": "Keyboard",
+    "procedure": "Confirm that when a modal dialog pops up, focus is set appropriately at the start of the modal dialog content.",
+    "outcomes": "Pass = when a modal dialog opens, focus is set to the appropriate content\n\nFail = when a modal dialog opens, focus is not set to the appropriate content\n\nNA = no modal dialog is present",
+    "automation": "manual",
+    "method": "Confirming where focus lands when a dialog opens requires triggering it live and observing the resulting focus target.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "2.4.3",
+        "name": "Focus Order",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-4-6",
+    "title": "Modal Dialogs Wrap Around",
+    "category": "Full Audit",
+    "requirement": "Modal Dialogs Wrap Around (INT-4-6)",
+    "expectation": "Modal dialogs MUST allow the user to move through the modal dialog's focusable elements, \"wrapping around\" from bottom-to-top and top-to-bottom using the <TAB> and <SHIFT>+<TAB> keyboard events.",
+    "tool": "Keyboard",
+    "procedure": "Tab through each modal dialog and confirm that the user can move through the modal dialog's focusable elements, \"wrapping around\" from bottom-to-top and top-to-bottom using the <TAB> and <SHIFT>+<TAB> keyboard events.",
+    "outcomes": "Pass = focus is trapped inside the modal dialog\n\nFail =focus is not trapped inside the modal dialog\n\nNA = no modal dialog is present",
+    "automation": "manual",
+    "method": "Confirming Tab/Shift+Tab wrap-around inside an open dialog requires live keyboard interaction with the triggered dialog.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "2.4.3",
+        "name": "Focus Order",
+        "level": "A"
+      },
+      {
+        "sc": "2.1.1",
+        "name": "Keyboard",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-4-7",
+    "title": "Modal Dialog Prevent Clicks Outside",
+    "category": "Full Audit",
+    "requirement": "Modal Dialog Prevent Clicks Outside (INT-4-7)",
+    "expectation": "Modal Dialogs MUST prevent mouse-clicks that occur outside the modal dialog from having any effect on the modal dialog.",
+    "tool": "Mouse",
+    "procedure": "Click outside the modal dialog with the mouse and confirm that it has no effect on the modal dialog.",
+    "outcomes": "Pass = when clicking outside of the modal dialog the modal dialog does not close\n\nFail = when clicking outside of the modal dialog the modal dialog does close\n\nNA = no modal dialog is present",
+    "automation": "manual",
+    "method": "Confirming a click outside an open dialog has no effect requires triggering the dialog live and clicking outside it.",
+    "checks": [],
+    "wcag": []
+  },
+  {
+    "id": "INT-4-8",
+    "title": "Dialog Main Heading",
+    "category": "Full Audit",
+    "requirement": "Dialog Main Heading (INT-4-8)",
+    "expectation": "If a heading is used in a dialog the first heading level MUST be H2 followed by appropriate heading levels.",
+    "tool": "Screen Reader",
+    "procedure": "1) Check for the presence of a heading in the dialog\n2) If a heading is used, confirm that the main heading within the dialog is an H2",
+    "outcomes": "Pass = the main heading within the dialog is an H2\n\nFail = the main heading within the dialog is not an H2\n\nNA = no dialog is present OR there is not a heading within the dialog",
+    "automation": "partial",
+    "method": "Within each detected dialog element, checks whether the first heading present is an H2.",
+    "checks": [
+      "custom:modal_static_aria"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-4-9",
+    "title": "Dialogs Close on ESC",
+    "category": "Full Audit",
+    "requirement": "Dialogs Close on ESC (INT-4-9)",
+    "expectation": "Dialog windows MUST have the <ESC> keyboard event set to close the dialog.",
+    "tool": "Keyboard",
+    "procedure": "Hit ESC and confirm that the dialog closes.",
+    "outcomes": "Pass = the ESC key closes the dialog successfully\n\nFail = the ESC key does not close the dilaog successfully \n\nNA = no dialog is present",
+    "automation": "manual",
+    "method": "Confirming the Escape key closes an open dialog requires triggering it live via its real interaction.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "2.1.1",
+        "name": "Keyboard",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-4-10",
+    "title": "Dialogs Restore Focus",
+    "category": "Full Audit",
+    "requirement": "Dialogs Restore Focus (INT-4-10)",
+    "expectation": "Dialogs MUST restore focus to their triggering element when the dialog is closed.",
+    "tool": "Keyboard",
+    "procedure": "After hitting <esc> to close the dialog, confirm that focus is restored to the triggering element on the page.",
+    "outcomes": "Pass = after closing the dialog focus is returned to the correct triggering element\n\nFail = after closing the dialog focus is not returned to the correct triggering element\n\nNA = no dialog is present",
+    "automation": "manual",
+    "method": "Confirming focus returns to the triggering element after a dialog closes requires triggering and closing it live.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "2.4.3",
+        "name": "Focus Order",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-5-6",
+    "title": "Target Size",
+    "category": "Full Audit",
+    "requirement": "Target Size (INT-5-6)",
+    "expectation": "Actionable components have a minimum target size of 24x24 CSS pixels except for:\n\nObjects with a target offset of at least 24px.\nEX: A 20px width “Cancel” button has its right most edge at least 4px away from a “Submit” button placed on the right.\nInline content within a sentence or block of text.\nEX: A wiki paragraph has multiple instances of hyperlinked text. Increasing the height and width of these links would impact the presentation of text and make it more difficult to read.",
+    "tool": "Browser - Inspect Code",
+    "procedure": "Use browser inspect tool to view the CSS values under the “Computed” tab. Find the height and width properties for the component. \nEnsure that each control has a width and height greater than or equal to 24px OR \nEX: A 20px width “Cancel” button has its right most edge at least 4px away from a “Submit” button placed on the right.",
+    "outcomes": "Pass: Both height and width are greater than or equal to 24px OR less than 24px with sufficient spacing between controls.\n\nFail: Either the height or width is less than 24px AND the center of the control is less than 24px from another control\n\nNA: Target is a link or button in a block of text that requires a specific presentation.",
+    "automation": "partial",
+    "method": "Computes the rendered bounding box of every interactive element and flags any smaller than 24x24 CSS px whose center is also closer than 24px to a neighboring control. The inline-text-link and fixed-spacing exceptions require a final human check.",
+    "checks": [
+      "custom:target_size"
+    ],
+    "wcag": [
+      {
+        "sc": "2.5.8",
+        "name": "Target Size (Minimum)",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "INT-5-1",
+    "title": "Links vs. Buttons",
+    "category": "Full Audit",
+    "requirement": "Links vs. Buttons (INT-5-1)",
+    "expectation": "User interface elements defined as links (anchor elements) SHOULD behave as links and user interface elements defined as buttons SHOULD behave as buttons:\n- Links reference or move the user to another location\n- Buttons trigger an action or event",
+    "tool": "Browser - Inspect Code",
+    "procedure": "Inspect each button and link element and confirm that each element has a defined role which is accurate for the element's purpose implemented through correct use of native element or ARIA role. ",
+    "outcomes": "Pass = all links and buttons have accurately defined roles through correct use of native elements or ARIA roles\n\nFail = one or more link or button element does not have an accurate role\n\nNA = no link or button elements are present ",
+    "automation": "partial",
+    "method": "Flags anchors with no href attribute (should likely be a <button>) and non-interactive elements (<div>/<span>) carrying click handlers without a button/link role. Confirming actual click-vs-navigate behavior for every control is manual.",
+    "checks": [
+      "custom:role_semantics"
+    ],
+    "wcag": [
+      {
+        "sc": "4.1.2",
+        "name": "Name, Role, Value",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-5-3",
+    "title": "Valid Link href Attribute",
+    "category": "Full Audit",
+    "requirement": "Valid Link href Attribute (INT-5-3)",
+    "expectation": "Links MUST contain a valid href attribute value and MUST  not point to \"javascript:void(0);\" nor \"#\".",
+    "tool": "ANDI",
+    "procedure": "Bring up the list of links with ANDI if available and confirm no links HREF points to \"javascript:void(0);\" nor \"#\".",
+    "outcomes": "Pass = all links contain valid href attribute values\n\nFail = one or more links do not contain valid href values\n\nNA = no links are present",
+    "automation": "automated",
+    "method": "Scans every link's resolved href for the \"#\" or \"javascript:void(0)\" anti-patterns.",
+    "checks": [
+      "custom:invalid_href"
+    ],
+    "wcag": [
+      {
+        "sc": "2.1.1",
+        "name": "Keyboard",
+        "level": "A"
+      },
+      {
+        "sc": "4.1.2",
+        "name": "Name, Role, Value",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-5-4",
+    "title": "Links Opening in New Tabs",
+    "category": "Full Audit",
+    "requirement": "Links Opening in New Tabs (INT-5-4)",
+    "expectation": "If a link opens in a new browser tab or window an aria-label AND visual cue MUST be added to inform users of this interaction.",
+    "tool": "Browser - Inspect Code",
+    "procedure": "For each link that opens automatically in a new window or tab:\n\n1. Confirm that there is an aria-label informing users that this link opens to a new window.\n\n2. Check that there is a visual cue in text that this link opens to a new window.",
+    "outcomes": "Pass = all links which open in a new window or tab have an aria-label and visual cue informing users of this interaction\n\nFail = one or more links which open in a new window or tab do not have an aria-label OR visual cue informing users of this interaction\n\nNA = no links open in a new window or tab",
+    "automation": "partial",
+    "method": "Flags every target=\"_blank\" link and checks whether it carries an aria-label/visible text mentioning \"new window/tab\". Judging whether an accompanying icon is a sufficient visual cue is manual.",
+    "checks": [
+      "custom:new_tab_links"
+    ],
+    "wcag": [
+      {
+        "sc": "3.2.5",
+        "name": "Change on Request",
+        "level": "AAA"
+      }
+    ]
+  },
+  {
+    "id": "INT-5-5",
+    "title": "Click and Drag Movements",
+    "category": "Full Audit",
+    "requirement": "Click and Drag Movements (INT-5-5)",
+    "expectation": "An action that relies on clicking and dragging of content can also be achieved by a single pointer without dragging unless dragging is essential to the activity.\n\nExample of single pointer Pass: A quiz relies on users clicking and dragging information into the correct bucket. Users are also able to click once to select an option, then click on the correct bucket.\nExample of essential activity: A medical app requires clicking and dragging an object to a target to accurately measure the user’s precision.",
+    "tool": "Visual Inspection",
+    "procedure": "Visually inspect the page to determine whether any functionality requires a user to click and move their mouse to access content.",
+    "outcomes": "Pass: All click and drag functionality can also be performed with a single pointer OR the dragging movement is essential.\n\nFail: Click and drag functionality cannot be completed with a single pointer.\n\nNA: The page does not contain click and drag functionality.",
+    "automation": "manual",
+    "method": "Confirming a drag interaction has a single-pointer (click-based) alternative requires manually operating the actual drag-and-drop widget.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "2.5.7",
+        "name": "Dragging Movements",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "INT-6-6",
+    "title": "Flexible Orientation",
+    "category": "Full Audit",
+    "requirement": "Flexible Orientation (INT-6-6)",
+    "expectation": "Content MUST adapt to the device orientation when orientation is changed from portrait to landscape unless a specific orientation is required for use of the page.",
+    "tool": "System Settings",
+    "procedure": "Set display orientation to each orientation mode (portrait and landscape) and review how the content responds. \nThis can be done using OS settings (Start>Settings>System>Display) or inspecting the page in your browser and using the device list to change orientations.",
+    "outcomes": "Pass = Content adapts to all display orientations\n\nFail=Content does not adapt to all display orientations\n\nNA =A specific display orientation is essential (e.g. bank check)",
+    "automation": "partial",
+    "method": "Playwright renders the page at matching portrait and landscape viewport dimensions and flags new horizontal overflow or clipped content introduced by the rotation. Whether a fixed orientation is genuinely essential to the content is a judgment call.",
+    "checks": [
+      "custom:orientation"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.4",
+        "name": "Orientation",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "INT-6-1",
+    "title": "Pause, Stop, Hide Moving Content",
+    "category": "Full Audit",
+    "requirement": "Pause, Stop, Hide Moving Content (INT-6-1)",
+    "expectation": "A mechanism MUST be provided to pause, stop, or hide any content that meets the following criteria:\n\n• Starts automatically\n• Is presented in parallel with other content\nAND\n• moves, blinks or scrolls for >5 seconds\nOR \n• All auto-updating content regardless of duration",
+    "tool": "Visual Inspection",
+    "procedure": "1) Perform a visual inspection of the page\n2) Confirm that for any content that meets the following criteria, a mechanism is provided to pause, play, or hide the applicable content:\n• Starts automatically\n• Is presented in parallel with other content\nAND\n• moves, blinks or scrolls for >5 seconds\nOR \n• All auto-updating content regardless of the time of duration",
+    "outcomes": "Pass = a mechanism is provided to pause, stop, or hide auto-playing; moving or blinking; auto-updating content\n\nFail = a mechanism is not provided to pause, stop, or hide auto-playing; moving or blinking; auto-updating content\n\nNA = no auto-playing; moving or blinking; auto-updating content is present",
+    "automation": "partial",
+    "method": "Detects <marquee>, CSS animations with an infinite iteration count, and autoplaying <video>/animated content, then checks for a nearby pause/stop control referenced by an aria-label.",
+    "checks": [
+      "custom:blink_flash",
+      "custom:media_controls"
+    ],
+    "wcag": [
+      {
+        "sc": "2.2.2",
+        "name": "Pause, Stop, Hide",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-6-2",
+    "title": "Pause or Adjust Volume for Auto Playing Audio",
+    "category": "Full Audit",
+    "requirement": "Pause or Adjust Volume for Auto Playing Audio (INT-6-2)",
+    "expectation": "For any audio which 1) plays automatically and 2) lasts for >3 seconds, ONE of the following MUST be true:\n\n• A mechanism to pause the content is presented to the user\nOR\n• A mechanism for adjusting the volume of the content is presented to the user AND it does not rely on the system audio levels to adjust the volume.",
+    "tool": "Visual Inspection",
+    "procedure": "Confirm that for any audio which 1) plays automatically and 2) lasts for >3 seconds, ONE of the following is true:\n• A mechanism to pause the content is presented to the user.\nOR\n• A mechanism for adjusting the volume of the content is presented to the user AND it does not rely on the system audio levels to adjust the volume.",
+    "outcomes": "Pass = for all content which plays automatically and lasts for more than 3 seconds a mechanism is provided to pause OR adjust volume\n\nFail = a mechanism is not provided to pause OR adjust volume for all content which plays automatically and lasts for more than 3 seconds \n\nNA = no content which plays automatically and lasts for more than 3 seconds is present",
+    "automation": "partial",
+    "method": "Detects autoplaying <audio>/<video> elements and checks whether they are muted or expose native/custom controls for pausing or adjusting volume.",
+    "checks": [
+      "custom:media_controls"
+    ],
+    "wcag": [
+      {
+        "sc": "1.4.2",
+        "name": "Audio Control",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-6-4",
+    "title": "Warn About Timeout",
+    "category": "Full Audit",
+    "requirement": "Warn About Timeout (INT-6-4)",
+    "expectation": "Users MUST be warned prior to when a session times out and expires.",
+    "tool": "Visual Inspection",
+    "procedure": "Visual Inspection",
+    "outcomes": "Pass = session timeout warning occurs prior to session time out and expiration\n\nFail = session timeout occurs without warning\n\nNA = no session timeout is present",
+    "automation": "manual",
+    "method": "Session-timeout warning behavior only surfaces after waiting out a real session on the live application and cannot be exercised from a static or single-pass page audit.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "2.2.1",
+        "name": "Timing Adjustable",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-6-5",
+    "title": "Extend Timeout",
+    "category": "Full Audit",
+    "requirement": "Extend Timeout (INT-6-5)",
+    "expectation": "Users MUST be given at least 30 seconds to take action in order to avoid a session time out by extending the time limit (of a session) via a \"simple\" user action (e.g., \"press the space bar\").",
+    "tool": "Visual Inspection",
+    "procedure": "Confirm that users are given at least 30 seconds to take action in order to avoid a session time out by extending the time limit (of a session) via a \"simple\" user action (e.g., \"press the space bar\").",
+    "outcomes": "Pass = users are given at least 30 seconds to extend the session via a simple user action\n\nFail = users are given less than 30 seconds to extend the session via a simple user action\n\nNA = no session timeout is present",
+    "automation": "manual",
+    "method": "Confirming the minimum 30-second timeout-extension window requires exercising a real timing-based session on the live application.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "2.2.1",
+        "name": "Timing Adjustable",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "INT-6-7",
+    "title": "Motion Control",
+    "category": "Full Audit",
+    "requirement": "Motion Control (INT-6-7)",
+    "expectation": "If functionality can be operated or activated by device or user motion then it can also be operated or activated through UI components AND motion actuation can be turned off to avoid unintentional activation by the user.",
+    "tool": "NA",
+    "procedure": "For all functionality that can be operated or activated by moving the device or user motion input confirm that the same functionality can be operated or activated through UI components AND confirm that the motion actuation can be turned off by the user",
+    "outcomes": "Pass = all functionality that can be operated or activated by device or user motion has a UI control alternative AND motion actuation can be turned off by the user\n\nFail = any aspect of functionality that can be operated or activated by device or user motion does not have a UI control alternative OR motion actuation cannot be turned off by the user\n\nNA = no functionality that can be operated or activated by device or user motion is present",
+    "automation": "manual",
+    "method": "Device/user motion actuation can only be exercised with a physical device's motion sensors, which a browser-based audit cannot simulate.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "2.5.4",
+        "name": "Motion Actuation",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "NAV-1-2",
+    "title": "Mouse Hover and Keyboard Focus are Equivalent",
+    "category": "Full Audit",
+    "requirement": "Mouse Hover and Keyboard Focus are Equivalent (NAV-1-2)",
+    "expectation": "Content which is hidden until it receives mouse hover and then becomes visible MUST also be shown when it receives keyboard focus and hidden again when focus is removed.",
+    "tool": "Keyboard",
+    "procedure": "1) Run through all use cases using the keyboard only (i.e., without a mouse) \n2)Confirm that any mouse hover events are also available to the keyboard when the keyboard focus is placed on the element.",
+    "outcomes": "Pass = all mouse hover events are also available to the keyboard when the keyboard focus is placed on the element\n\nFail = one or more mouse hover events are not available to the keyboard when the keyboard focus is placed on the element\n\nNA = mouse hover events are not present",
+    "automation": "partial",
+    "method": "Scans stylesheets for :hover selectors that alter visibility/display of content, then programmatically focuses the same trigger element and compares computed style to confirm the same content also appears on keyboard focus. Navigation submenus without ARIA are hovered with the mouse and then focused with the keyboard to confirm a submenu that appears on hover also appears (and is reachable) on keyboard focus.",
+    "checks": [
+      "custom:hover_focus_parity",
+      "custom:hover_menu_keyboard"
+    ],
+    "wcag": [
+      {
+        "sc": "2.1.1",
+        "name": "Keyboard",
+        "level": "A"
+      },
+      {
+        "sc": "1.4.13",
+        "name": "Content on Hover or Focus",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "NAV-1-4",
+    "title": "Content on Hover or Focus",
+    "category": "Full Audit",
+    "requirement": "Content on Hover or Focus (NAV-1-4)",
+    "expectation": "For tooltips and components that show hidden content when they receive keyboard or pointer focus and hidden after removal of focus ensure they are dismissible, hoverable, and persistent.",
+    "tool": "Keyboard",
+    "procedure": "1) Use the keyboard to navigate to all tooltips and components that show hidden content when they receive keyboard or pointer focus and hide it after removal of focus \n2) ensure they are dismissible, hoverable, and persistent.",
+    "outcomes": "Pass = all of the hover show/hide content is dismissible, hoverable, and persistent\n\nFail =  hover show/hide content is not all dismissible, hoverable, and persistent\n\nNA = no  hover show/hide content is present",
+    "automation": "partial",
+    "method": "Flags elements relying on the native title=\"\" attribute for supplementary content, since native tooltips are not dismissible, hoverable, or reliably persistent as this requirement demands.",
+    "checks": [
+      "custom:hover_focus_parity"
+    ],
+    "wcag": [
+      {
+        "sc": "1.4.13",
+        "name": "Content on Hover or Focus",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "NAV-1-5",
+    "title": "Pointer and Multipoint Gestures",
+    "category": "Full Audit",
+    "requirement": "Pointer and Multipoint Gestures (NAV-1-5)",
+    "expectation": "An action that is performed by a 'path-based gesture' or multipoint gesture MUST also be completable using a single pointer gesture and a keyboard or alternative input device.",
+    "tool": "Mouse",
+    "procedure": "1. Use the keyboard to navigate to all path-based or multipoint gesture operable controls and confirm that they can all be operated with keyboard control \n\n2. Use the mouse to interact with all path-based or multipoint gesture operable controls and confirm that they can all be operated with a single pointer gesture control as well.",
+    "outcomes": "Pass = all actions that can be performed by a path-based or multipoint gesture can also be completed with a keyboard and a single pointer gesture (individual mouse clicks)\n\nFail = one or more actions that can be performed by a path-based or multipoint gesture cannot be completed with a keyboard OR a single pointer gesture (individual mouse clicks)\n\nNA = no actions that can be performed by a path-based or multipoint gesture are present",
+    "automation": "manual",
+    "method": "Confirming a path-based or multipoint gesture has a working single-pointer/keyboard alternative requires manually operating the real gesture-driven component.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "2.5.1",
+        "name": "Pointer Gestures",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "NAV-1-8",
+    "title": "Skip to Main Content Link",
+    "category": "Full Audit",
+    "requirement": "Skip to Main Content Link (NAV-1-8)",
+    "expectation": "A \"skip to main content\" link MUST be included on every page as the first link (or second if \"skip to login\" link is present) on the page. The link MUST skip to the main content of the page or the errors summary if present and may be visually hidden until it has focus.",
+    "tool": "Keyboard",
+    "procedure": "Tool: Keyboard\n\nHit Tab after the page loads. Confirm that the first or second link on the page is \"skip to main content\" - it may be visibly hidden until it receives focus. If running the test on a Single Page Application (SPA) refresh the page and confirm that the first or second link is \"Skip to main content\"",
+    "outcomes": "Pass = a skip to main content link is provided and it is fully operational\n\nFail = a skip to main content link is not provided OR the skip to content link is not fully operational",
+    "automation": "automated",
+    "method": "Checks that the first (or second, after a \"skip to login\" link) link in the page's tab order is a working skip link whose target element exists in the DOM.",
+    "checks": [
+      "custom:skip_link"
+    ],
+    "wcag": [
+      {
+        "sc": "2.4.1",
+        "name": "Bypass Blocks",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "NAV-1-6",
+    "title": "No Access Keys",
+    "category": "Full Audit",
+    "requirement": "No Access Keys (NAV-1-6)",
+    "expectation": "Access keys MUST not be used.",
+    "tool": "Keyboard",
+    "procedure": "Confirm that no accesskeys are used on the page.",
+    "outcomes": "Pass = no accesskeys are used\n\nFail = accesskeys are used",
+    "automation": "automated",
+    "method": "Scans the full DOM for any accesskey attribute, which this requirement prohibits outright.",
+    "checks": [
+      "custom:access_keys"
+    ],
+    "wcag": []
+  },
+  {
+    "id": "NAV-1-7",
+    "title": "Single Character Keyboard Shortcuts",
+    "category": "Full Audit",
+    "requirement": "Single Character Keyboard Shortcuts (NAV-1-7)",
+    "expectation": "If a single character shortcut is used then users MUST have the option to either turn it off or remap it to one or more non-printable keyboard characters.\n-OR-\nMake sure the single character shortcut is only active when the component it affects has focus.",
+    "tool": "Keyboard",
+    "procedure": "Confirm that where a single character shortcut is used that users have the option to either turn it off or remap it to one or more non-printable keyboard characters.\n-OR-\nMake sure the single character shortcut is only active when the component it affects has focus.",
+    "outcomes": "Pass = for all single character shortcuts, users have the option to either turn off or remap it to one or more non-printable keyboard characters OR the single character shortcut is only active when the component it affects has focus.\n\nFail = for all single character shortcuts, users do not have the option to either turn off or remap it to one or more non-printable keyboard characters AND the single character shortcut is active at all times.\n\nNA = no single character shortcuts are present",
+    "automation": "manual",
+    "method": "Detecting single-character keyboard shortcuts requires analyzing every JavaScript keydown listener's runtime behavior, which cannot be determined from the static DOM.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "2.1.4",
+        "name": "Character Key Shortcuts",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "NAV-2-2",
+    "title": "Disabled Control Focus",
+    "category": "Full Audit",
+    "requirement": "Disabled Control Focus (NAV-2-2)",
+    "expectation": "When a form field or control is disabled it SHOULD not receive keyboard focus. Doing this reinforces 1.4.1 Use of Color so that the only means of conveying that a control is disabled doesn't rely solely on color (https://www.w3.org/WAI/WCAG21/Understanding/use-of-color.html).\n\nList of Composite Control Exceptions:\n- Options in a List box\n- Menu items in a Menu or menu bar\n- Tab elements in a set of Tabs\n- Tree items in a Tree View",
+    "tool": "Keyboard",
+    "procedure": "Tab through the entire page and confirm that disabled elements do not receive visible keyboard focus unless the control is listed in the exceptions list",
+    "outcomes": "Pass = keyboard focus does not move to any disabled elements other than those which are included in the list of composite control exceptions\n\nFail = keyboard focus does move to one or more disabled elements which are not included in the list of composite control exceptions\n\nNA = no disabled elements are present",
+    "automation": "partial",
+    "method": "Tabs through every element in the page and flags any disabled/aria-disabled=\"true\" element that still receives keyboard focus, outside the listed composite-widget exceptions (listbox options, menu items, tabs, tree items).",
+    "checks": [
+      "custom:disabled_focus"
+    ],
+    "wcag": []
+  },
+  {
+    "id": "NAV-3-1",
+    "title": "Appropriate Use of Landmark Regions",
+    "category": "Full Audit",
+    "requirement": "Appropriate Use of Landmark Regions (NAV-3-1)",
+    "expectation": "The page MUST have a 'Main' landmark region defined at a minimum and Banner, Navigation, Search, Complementary, and ContentInfo roles are present if these content types are present in the page.\n\n",
+    "tool": "Accessibility Insights",
+    "procedure": "1) Open the page in the Chrome browser and use Accessibility Insights>Adhoc Tools>Landmarks  to visualize the landmark regions that are present in the page. \n2) Confirm that the page has a 'Main' landmark region defined at a minimum. \n3) Confirm that the Banner, Navigation, and ContentInfo roles are present if these content types are present in the page.",
+    "outcomes": "Pass = the page contains a main landmark region AND if content suited for a navigation, banner, or contentinfo region is present then the appropriate roles are applied to each content area respectively\n\nFail = the page does not contain a main landmark region OR content suited for a navigation, banner, or contentinfo region is present AND the appropriate roles are not \napplied to each content area respectively\n\nNA = the page content is not substantial enough to be grouped in one or more landmark regions",
+    "automation": "automated",
+    "method": "axe-core's landmark rule set confirms a Main landmark is present and that Banner/Navigation/ContentInfo regions are correctly structured where used.",
+    "checks": [
+      "axe:landmark-one-main",
+      "axe:landmark-banner-is-top-level",
+      "axe:landmark-contentinfo-is-top-level",
+      "axe:landmark-no-duplicate-banner",
+      "axe:landmark-no-duplicate-contentinfo"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      },
+      {
+        "sc": "2.4.1",
+        "name": "Bypass Blocks",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "NAV-4-4",
+    "title": "Consistent Context Cues",
+    "category": "Full Audit",
+    "requirement": "Consistent Context Cues (NAV-4-4)",
+    "expectation": "The following MUST be consistent on each page: \n• Page title\n• Current Navigation menu item\n• Progress Indicator / Wizard Step (if present)\n• Top-level heading (H1)\n• referring link (if present)",
+    "tool": "Browser - Inspect Code",
+    "procedure": "Confirm that the following are consistent on each page:\n\nPage title\n\nCurrent Navigation menu item\n\nProgress Indicator / Wizard Step (if present)\n\nTop-level heading (H1)\n\nreferring link (if present)",
+    "outcomes": "Pass = context cues are consistent on each page\n\nFail = one or more context cues are not consistent on each page",
+    "automation": "partial",
+    "method": "In batch/crawl mode, compares page title pattern, current-nav-item highlighting, H1 text, and progress-indicator text across the audited pages for consistency. Not applicable to a single-page audit.",
+    "checks": [
+      "custom:batch_context_cues"
+    ],
+    "wcag": [
+      {
+        "sc": "3.2.3",
+        "name": "Consistent Navigation",
+        "level": "AA"
+      },
+      {
+        "sc": "2.4.8",
+        "name": "Location",
+        "level": "AAA"
+      }
+    ]
+  },
+  {
+    "id": "NAV-4-5",
+    "title": "More Than One Way to Find Content",
+    "category": "Full Audit",
+    "requirement": "More Than One Way to Find Content (NAV-4-5)",
+    "expectation": "Users MUST be provided more than one way to find content within a website except when the web page is the result of a step or process. This provision MUST include two or more of the following navigational methods:\n• Links to navigate to related Web pages\n• a Table of Contents\n• a Site Map\n• a search function \n• a list of links to all other Web pages\n• Linking to all of the pages on the site from the home page",
+    "tool": "Visual Inspection",
+    "procedure": "1) Review the page and site navigation structure\n2) Confirm that the site provides at least 2 of the following ways to find content:\n-Links to navigate to related Web pages\n-Table of Contents\n-Site Map\n-Search function\n-List of links to all other Web pages\n-Linking to all of the pages on the site from the home page",
+    "outcomes": "Pass = the site provides 2 or more ways to find content\n\nFail = the site provides fewer than 2 ways to find content",
+    "automation": "partial",
+    "method": "Detects the presence of a <nav> region, a search form/input, and a link whose text or href suggests a sitemap, then counts how many distinct \"find content\" methods are present.",
+    "checks": [
+      "custom:find_content_methods"
+    ],
+    "wcag": [
+      {
+        "sc": "2.4.5",
+        "name": "Multiple Ways",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "NAV-4-1",
+    "title": "Same Relative Order",
+    "category": "Full Audit",
+    "requirement": "Same Relative Order (NAV-4-1)",
+    "expectation": "Components, like links, buttons, or contact forms, that appear on multiple pages MUST appear in the same relative order on every page.",
+    "tool": "Visual Inspection",
+    "procedure": "1) Perform a visual inspection of the page looking for navigation components\n2) Confirm that components (links, buttons, contact forms, etc.) that appear on multiple pages appear in the same relative order on every page.",
+    "outcomes": "Pass = components that appear on multiple pages appear in the same relative order on every page\n\nFail = one or more component that appears on multiple pages does not appear in the same relative order on every page\n\nNA = no component appears on multiple pages\n\n",
+    "automation": "partial",
+    "method": "In batch/crawl mode, compares the relative DOM order of repeated header/nav/footer components across the audited pages. Not applicable to a single-page audit.",
+    "checks": [
+      "custom:batch_component_order"
+    ],
+    "wcag": [
+      {
+        "sc": "3.2.3",
+        "name": "Consistent Navigation",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "NAV-4-2",
+    "title": "Name Consistently",
+    "category": "Full Audit",
+    "requirement": "Name Consistently (NAV-4-2)",
+    "expectation": "Consistent labels, names, and text alternatives MUST be used for content that has the same functionality.",
+    "tool": "Visual Inspection",
+    "procedure": "Confirm that content with the same functionality has consistent labels, names, and text alternatives.",
+    "outcomes": " Pass = content with the same functionality has consistent labels, names, and text alternatives\n\nFail = content with the same functionality does not have consistent labels, names, or text alternatives\n\nNA = no content with the same functionality is present\n\n",
+    "automation": "partial",
+    "method": "In batch/crawl mode, groups elements that share the same href/action across pages and compares their accessible names for consistency. Judging whether two controls truly share \"the same functionality\" is manual.",
+    "checks": [
+      "custom:batch_component_order"
+    ],
+    "wcag": [
+      {
+        "sc": "3.2.4",
+        "name": "Consistent Identification",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "NAV-4-3",
+    "title": "Consistent or Unique Link Text",
+    "category": "Full Audit",
+    "requirement": "Consistent or Unique Link Text (NAV-4-3)",
+    "expectation": "Links with the same HREF MUST have the same link text and vice versa, and links with different HREFs MUST have different link text and vice versa.",
+    "tool": "ANDI",
+    "procedure": "1) Use ANDI or the browser inspect feature to inspect each <a> link element in the page/view\n2) Review the HREF (URL) of all links and: \na. confirm that links with the same HREF have the same link text\nb. confirm that links with different HREFs have different link text and vice versa.",
+    "outcomes": "Pass = all links with the same HREF have the same link text and vice versa; and links with different HREFs have different link text and vice versa.\n\nFail = one or more links with the same HREF do not have the same link text and vice versa; and/or links with different HREFs do not have different link text and vice versa.\n\nNA = no links with the same HREF are present",
+    "automation": "automated",
+    "method": "Builds a map of href → link text (and vice versa) for the page and flags any href reused with different text, or identical text pointing to different destinations.",
+    "checks": [
+      "custom:link_text_consistency"
+    ],
+    "wcag": [
+      {
+        "sc": "2.4.4",
+        "name": "Link Purpose (In Context)",
+        "level": "A"
+      },
+      {
+        "sc": "3.2.4",
+        "name": "Consistent Identification",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "NAV-5-1",
+    "title": "Pagination is Navigation",
+    "category": "Full Audit",
+    "requirement": "Pagination is Navigation (NAV-5-1)",
+    "expectation": "Pagination controls MUST have the attribute role=\"navigation\".",
+    "tool": "Accessibility Insights",
+    "procedure": "1) Locate any 'pagination' controls in the page content\n2) Switch on the Accessibility Insights landmark tool\n3) Confirm that any pagination controls on the screen have role=\"navigation\".",
+    "outcomes": "Pass = all pagination controls have have role=\"navigation\"\n\nFail = one or more pagination controls do not have role=\"navigation\"\n\nNA = no pagination controls are present",
+    "automation": "partial",
+    "method": "Heuristically identifies pagination controls (numbered page links, \"next/previous\" patterns, class/aria-label containing \"pagination\") and checks for role=\"navigation\".",
+    "checks": [
+      "custom:pagination"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "NAV-5-2",
+    "title": "Label Pagination",
+    "category": "Full Audit",
+    "requirement": "Label Pagination (NAV-5-2)",
+    "expectation": "Pagination controls MUST have the attribute aria-label=\"Pagination\". If there are more than one pagination controls on a page, they MUST have unique labels, but still contain the word \"Pagination\".",
+    "tool": "Screen Reader",
+    "procedure": "Cycle through each landmark role with each supported screen reader and confirm that any pagination controls have the word \"Pagination\" included in their aria-label.",
+    "outcomes": "Pass =  all pagination controls have \"Pagination\" included in their aria-label\n\nFail = one or more pagination controls does not have \"Pagination\" included in its aria-label\n\nNA = no pagination controls are present",
+    "automation": "partial",
+    "method": "For each heuristically-detected pagination control, checks whether its aria-label includes the word \"Pagination\".",
+    "checks": [
+      "custom:pagination"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "NAV-5-3",
+    "title": "Wizard Context Provided",
+    "category": "Full Audit",
+    "requirement": "Wizard Context Provided (NAV-5-3)",
+    "expectation": "Process or Wizard Step Indicators MUST provide context and status to screen readers (e.g., \"Current Step: Add Card, Step 2 of 4\").",
+    "tool": "Screen Reader",
+    "procedure": "Read any process or Wizard Step Indicators with screen reader and confirm it provides context and status to screen readers (e.g., \"Current Step: Add Card, Step 2 of 4\").",
+    "outcomes": "Pass = the process / wizard step indicator provides context and status to screen readers\n\nFail = the process / wizard step indicator does not provide context or status to screen readers\n\nNA = no process / wizard step indicators are present",
+    "automation": "manual",
+    "method": "Confirming a screen reader announces step context and status for a wizard indicator requires live assistive-technology testing.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "NAV-5-4",
+    "title": "Wizard Info in Title/H1",
+    "category": "Full Audit",
+    "requirement": "Wizard Info in Title/H1 (NAV-5-4)",
+    "expectation": "Any Process or Wizard Step Indicator information MUST be included in the page title and H1.",
+    "tool": "Screen Reader",
+    "procedure": "Confirm that any process or wizard step indicator information, if present, is included in the page title and H1.",
+    "outcomes": "Pass = any process or wizard step indicator information is included in the page title and H1\n\nFail = any process or wizard step indicator information is not included in the page title and/or H1\n\nNA = process or wizard step indicator information is not present",
+    "automation": "partial",
+    "method": "Detects step-indicator text patterns (e.g. \"Step 2 of 4\") and checks whether the same text appears in the page <title> and H1.",
+    "checks": [
+      "custom:wizard_context"
+    ],
+    "wcag": [
+      {
+        "sc": "2.4.2",
+        "name": "Page Titled",
+        "level": "A"
+      },
+      {
+        "sc": "2.4.8",
+        "name": "Location",
+        "level": "AAA"
+      }
+    ]
+  },
+  {
+    "id": "TXT-1-1",
+    "title": "Use Headings",
+    "category": "Full Audit",
+    "requirement": "Use Headings (TXT-1-1)",
+    "expectation": "Pages MUST organize content using headings (e.g., H1, H2, etc.) AND the headings must accurately describe their sub-content.",
+    "tool": "ANDI",
+    "procedure": "1) Open ANDI > Structures > Headings > View Headings List\n2) View all headings instances listed below the 'View headings list' button\n3) Confirm that each page organizes content using headings (e.g., H1, H2, etc.) and that all content which serves as a heading visually and structurally is also exposed as a heading programmatically.\n4) Confirm that the page headings accurately describe their sub-content",
+    "outcomes": "Pass = headings are used AND they accurately describe their sub-content\n\nFail = headings are not used OR they do not accurately describe their sub-content\n\nNA = there is not sufficient content to warrant the use of headings",
+    "automation": "partial",
+    "method": "axe-core confirms headings are structurally well-formed (no skipped levels, no empty headings) and that content is organized with real heading elements rather than styled text. Judging whether each heading accurately describes its sub-content is manual.",
+    "checks": [
+      "axe:heading-order",
+      "axe:empty-heading",
+      "axe:page-has-heading-one"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      },
+      {
+        "sc": "2.4.6",
+        "name": "Headings and Labels",
+        "level": "AA"
+      },
+      {
+        "sc": "2.4.10",
+        "name": "Section Headings",
+        "level": "AAA"
+      }
+    ]
+  },
+  {
+    "id": "TXT-1-2",
+    "title": "Use a Single Descriptive H1",
+    "category": "Full Audit",
+    "requirement": "Use a Single Descriptive H1 (TXT-1-2)",
+    "expectation": "Each page MUST have only one H1 which is descriptive of the overall page topic/purpose. The H1 and the page title SHOULD be similar and consistent. ",
+    "tool": "ANDI",
+    "procedure": "1) Open ANDI > Structures >  Headings > View Headings List\n2) View all headings instances listed below the 'View Headings List' button and confirm that there is a single H1 in the list\n3) Confirm that the H1 is descriptive of the overall page topic/purpose\n4) Confirm that the H1 and page title are similar and consistent",
+    "outcomes": "Pass = there is only one H1 level heading present AND it is descriptive of the page topic/purpose AND similar similar to the page title\n\nFail = there are two or more H1 level headings present OR the H1 is not descriptive of the page topic/purpose OR not similar to the page title",
+    "automation": "partial",
+    "method": "Counts H1 elements on the page (flagging zero or multiple) via axe's page-has-heading-one rule plus a direct count. Judging whether the single H1 is descriptive and consistent with the page title is manual.",
+    "checks": [
+      "axe:page-has-heading-one",
+      "custom:heading_structure"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      },
+      {
+        "sc": "2.4.6",
+        "name": "Headings and Labels",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "TXT-1-3",
+    "title": "H1 at Top of Main",
+    "category": "Full Audit",
+    "requirement": "H1 at Top of Main (TXT-1-3)",
+    "expectation": "The H1 MUST be within and at the top of the Main ARIA Landmark, with no plain text content (i.e. <div> or <span>) above it.",
+    "tool": "ANDI",
+    "procedure": "1) Run ANDI>Structures>Headings\n2) find the H1 outlined on the page and confirm that the H1 is within and at the top of the Main ARIA Landmark (also outlined), with no plain text content (i.e. <div> or <span>) above it.",
+    "outcomes": "Pass = H1 is within and at the top of the Main ARIA Landmark, with no plain text content above it\n\nFail = H1 is not within and at the top of the Main ARIA Landmark OR there is plain text content above it",
+    "automation": "partial",
+    "method": "Locates the Main landmark and the page's H1, then checks that the H1 is the first meaningful content inside Main with no preceding text nodes.",
+    "checks": [
+      "custom:heading_structure"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "TXT-2-2",
+    "title": "Paragraph Markup for Text",
+    "category": "Full Audit",
+    "requirement": "Paragraph Markup for Text (TXT-2-2)",
+    "expectation": "Paragraphs MUST be marked up as paragraphs.",
+    "tool": "Browser - Inspect Code",
+    "procedure": "1) Determine whether or not the page contains paragraphs of text by scanning the page visually.\n2) If paragraphs of text are present, pull up the source code with the browser inspect feature (e.g. Chrome F12 Dev tools) and confirm that those paragraphs are marked up properly with the HTML <p> element.",
+    "outcomes": "Pass = all paragraph text is marked up  as <p> element\n\nFail = all paragraph text is not marked up  as <p> element",
+    "automation": "partial",
+    "method": "Flags likely pseudo-paragraphs — runs of text separated by <br><br> rather than wrapped in <p> elements.",
+    "checks": [
+      "custom:paragraph_markup"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "TXT-2-3",
+    "title": "Group Items with Lists",
+    "category": "Full Audit",
+    "requirement": "Group Items with Lists (TXT-2-3)",
+    "expectation": "Groups of items (e.g., a navigation menu or group of tabs) MUST be marked up as a list.",
+    "tool": "Browser - Inspect Code",
+    "procedure": "1) Locate any text content that is presented in a list format such as bulleted or numbered lists.\n2) Locate any groups of items that should be marked up as lists (e.g., a navigation menu or group of tabs) \n3) Use the browser inspect feature to examine the HTML for these list components and confirm that they are properly marked up as lists.",
+    "outcomes": "Pass = all groups of items are marked as lists\n\nFail = all groups of items are not marked as lists\n\nNA = no groups of items are present",
+    "automation": "partial",
+    "method": "Flags groups of 3+ visually-repeated sibling elements (e.g. a run of <a> tags forming a menu) that are not wrapped in a <ul>/<ol>/<dl>.",
+    "checks": [
+      "custom:list_grouping"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "TXT-2-1",
+    "title": "Use Correct Semantic Markup",
+    "category": "Full Audit",
+    "requirement": "Use Correct Semantic Markup (TXT-2-1)",
+    "expectation": "Whenever content conveys information through presentation of text, appropriate semantic markup (e.g., em, strong, cite, blockquote, sub, and sup) MUST be used.  ",
+    "tool": "Browser - Inspect Code",
+    "procedure": "1) Locate any text content that is visually styled as bold, citation, blockquote, or other text styles.\n2) Use the browser inspect feature to examine the HTML for text with visual styling.\n3) Confirm that wherever content conveys information through visual style  of text  appropriate, semantic HTML markup is being used (e.g., em, strong, cite, blockquote, sub, and sup).",
+    "outcomes": "Pass = all text content has semantic markup applied appropriately\n\nFail = some text content does not have semantic markup applied correctly",
+    "automation": "partial",
+    "method": "Flags presentational <b>/<i> elements, which usually should be <strong>/<em> when they convey emphasis or importance rather than pure styling.",
+    "checks": [
+      "custom:semantic_markup"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "TXT-3-1",
+    "title": "Code Order = Logical Content Order",
+    "category": "Full Audit",
+    "requirement": "Code Order = Logical Content Order (TXT-3-1)",
+    "expectation": "The logical order of content MUST be present in the code order, allowing for successful use of the content when linearized and/or without CSS.",
+    "tool": "Web Accessibility Evaluation Toolbar (WAVE)",
+    "procedure": "1) Open the WAVE tool with the page you are testing open in your browser.\n2) Use the toggle switch to 'Disable styles'.\n3) Confirm that the logical order of content is present in the code order.",
+    "outcomes": "Pass = the logical order of the content is followed\n\nFail = the logical order of the content is not followed",
+    "automation": "partial",
+    "method": "Compares each element's DOM order position against its rendered top-to-bottom, left-to-right visual position (bounding-box order) and flags large divergences, approximating the WAVE \"disable styles\" technique.",
+    "checks": [
+      "custom:reading_order"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.2",
+        "name": "Meaningful Sequence",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "TXT-3-2",
+    "title": "Remove or Park “Hidden” Content at the Bottom",
+    "category": "Full Audit",
+    "requirement": "Remove or Park “Hidden” Content at the Bottom (TXT-3-2)",
+    "expectation": "\"Hidden\" content being \"parked\" for later use/display (e.g., the text to be used by a JS calendar picker) SHOULD be removed from the DOM if possible, and if not it SHOULD be placed at the bottom.",
+    "tool": "Web Accessibility Evaluation Toolbar (WAVE)",
+    "procedure": "1) Open the WAVE tool with the page you are testing open in your browser.\n2) Use the toggle switch to 'Disable styles'.\n3) Confirm that \"hidden\" content being \"parked\" for later use/display is located at the bottom of the document.",
+    "outcomes": "Pass = all \"hidden\" content being \"parked\" for later use/display is located at the bottom of the DOM\n\nFail = some \"hidden\" content being \"parked\" for later use/display is not located at the bottom of the DOM\n\nNA = no \"hidden\" content being \"parked\" for later use/display is present",
+    "automation": "partial",
+    "method": "Finds elements hidden via display:none/visibility:hidden (and not marked aria-hidden) and checks whether they are positioned near the end of the document body as this requirement recommends.",
+    "checks": [
+      "custom:parked_content"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.2",
+        "name": "Meaningful Sequence",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "TXT-4-1",
+    "title": "Instructions Don’t Rely on Visual Cues",
+    "category": "Full Audit",
+    "requirement": "Instructions Don’t Rely on Visual Cues (TXT-4-1)",
+    "expectation": "Instructions MUST never refer solely to visual cues such as size, shape, color, or spatial directions.",
+    "tool": "Visual Inspection",
+    "procedure": "1) Review any instruction text (on-screen and screen reader only)\n2) Confirm that Instructions and interactions never refer solely to visual cues such as size, shape, color, or spatial directions.",
+    "outcomes": "Pass = instructions and interactions never refer solely to visual cues such as size, shape, color, or spatial directions\n\nFail = instructions and interactions refer solely to visual cues such as size, shape, color, or spatial directions\n\nNA = no instructions  are present",
+    "automation": "manual",
+    "method": "Judging whether instructional text relies solely on a visual/spatial cue (\"click the round, red button\") requires reading comprehension of free-form prose that cannot be reliably pattern-matched.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "1.3.3",
+        "name": "Sensory Characteristics",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "TXT-4-2",
+    "title": "Instructions Include Labels as Cues",
+    "category": "Full Audit",
+    "requirement": "Instructions Include Labels as Cues (TXT-4-2)",
+    "expectation": "Text labels and/or names MUST be used when providing instructions to allow users who cannot perceive other indicators to locate elements.",
+    "tool": "Screen Reader",
+    "procedure": "Confirm that text labels and/or names are used when providing instructions to allow users who cannot perceive other indicators to locate elements.",
+    "outcomes": "Pass = where on-screen instructions refer to elements with labels, those labels are included in the instructions\n\nFail =  where on-screen instructions refer to elements with labels, those labels are not included in the instructions\n\nNA =  on-screen instructions do not refer to elements with labels; no on-screen instructions are present",
+    "automation": "manual",
+    "method": "Confirming that on-screen instructions reference elements by their actual accessible label text requires cross-referencing free-form prose against the page's controls, a task better suited to human review.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "1.3.3",
+        "name": "Sensory Characteristics",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "TXT-5-1",
+    "title": "No Layout Tables",
+    "category": "Full Audit",
+    "requirement": "No Layout Tables (TXT-5-1)",
+    "expectation": "Tables MUST not be used for layout purposes. Layout tables are not a direct WCAG 2.0 AA failure, however when a table is linearized it can complicate or confuse the linear order of the content (See WCAG F49 for details).",
+    "tool": "ANDI",
+    "procedure": "1) Run the ANDI tool on the page.\n2) Locate any table elements identified by ANDI on the page.\n3) Confirm that none of the tables are used for layout purposes.",
+    "outcomes": "Pass = tables are not used for layout positioning; CSS is used instead\n\nFail = one or more layout table(s) is used",
+    "automation": "partial",
+    "method": "Flags <table> elements that contain no <th> and no <caption>, a strong heuristic signature of a layout table rather than a data table.",
+    "checks": [
+      "custom:layout_tables"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      },
+      {
+        "sc": "1.3.2",
+        "name": "Meaningful Sequence",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "TXT-5-2",
+    "title": "Markup Tables",
+    "category": "Full Audit",
+    "requirement": "Markup Tables (TXT-5-2)",
+    "expectation": "All data tables MUST use THs and every TH MUST have scope=\"col\" or \"row\" set unless any implied relationships would be untrue.  In that case, headers= MUST be used to hard code how headers are read to users.",
+    "tool": "ANDI",
+    "procedure": "1) Run the ANDI tool on the page.\n2) Locate any table elements identified by ANDI on the page.\n3) Confirm that <th> elements are used as appropriate and every <th> element has scope as appropriate. If present, confirm that headers point to the correct <th> elements' IDs.",
+    "outcomes": "Pass = tables have correct <th> elements, <td> elements, and scope applied appropriately\n\nFail = one or more tables does not have correct <th> elements, <td> elements, and scope applied appropriately\n\nNA = no tables are present",
+    "automation": "automated",
+    "method": "axe-core validates that data cells are associated with header cells and that scope/headers attributes are used correctly.",
+    "checks": [
+      "axe:th-has-data-cells",
+      "axe:td-headers-attr",
+      "axe:scope-attr-valid",
+      "axe:table-duplicate-name"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "TXT-5-3",
+    "title": "Identify Tables",
+    "category": "Full Audit",
+    "requirement": "Identify Tables (TXT-5-3)",
+    "expectation": "Data tables MUST be identified for screen readers by including the \"title\" of the table in its <caption> element, e.g., \"Transaction History for x2304\".\nNote: The caption may be hidden visually with CSS.",
+    "tool": "Screen Reader",
+    "procedure": "Bring up the list of tables (or cycle through each if a list is not available) with each supported screen reader and confirm that each table is identified.",
+    "outcomes": "Pass = all tables have titles that are read by the screen reader\n\nFail = one or more tables does not have a title that is read by the screen reader\n\nNA = no tables are present",
+    "automation": "partial",
+    "method": "Checks every <table> for a <caption> element. Judging whether the caption text is an accurate title is manual.",
+    "checks": [
+      "custom:table_captions"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "TXT-5-4",
+    "title": "Summarize Table Layout",
+    "category": "Full Audit",
+    "requirement": "Summarize Table Layout (TXT-5-4)",
+    "expectation": "If a data table has more than 4 table headings (THs), the layout/functionality of the table MUST be described in the caption after the \"title\" of the table. (E.g., Transaction History for x2304: recent transactions in column 1 and details in the next 4 columns. Actions for each transaction are available in column 6.”)\nNote: The caption may be hidden visually with CSS.",
+    "tool": "Screen Reader",
+    "procedure": "Bring up the list of tables (or cycle through each if a list is not available) with each supported screen reader and confirm that each table with more than 4 THs has its layout/functionality described after the \"title\".",
+    "outcomes": "Pass = all complex tables have summaries of layout and functionality and screen reader announces the information\n\nFail = all complex tables do not have summaries of layout and functionality OR screen reader does not announces the information\n\nNA = no complex tables are present",
+    "automation": "partial",
+    "method": "Counts <th> elements per table; for tables with more than 4, checks whether the caption includes additional descriptive text beyond a short title (a proxy for a layout/functionality summary).",
+    "checks": [
+      "custom:table_captions"
+    ],
+    "wcag": [
+      {
+        "sc": "1.3.1",
+        "name": "Info and Relationships",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "VIS-1-1",
+    "title": "Summarize Table Layout",
+    "category": "Full Audit",
+    "requirement": "Summarize Table Layout (TXT-5-4)",
+    "expectation": "Pages MUST be coded to allow users to increase the font size of all page content without text clipping, truncating, or being obscured. ",
+    "tool": "System Settings",
+    "procedure": "Windows OS: Use the Windows key and type \"Make Text size bigger\"\n\nMacOS: Display settings>Larger Text\n\nUse the OS settings to increase text size to 200% and confirm that text on the target page adapts and is not clipped, truncated, or obscured.",
+    "outcomes": "Pass = all text adapts to Very Large font size setting and is visible without clipping truncation, or overlapping other text.\n\nFail = Some text does not adapt to Very Large font size setting and/or text clipping, truncation, or overlap occurs.",
+    "automation": "partial",
+    "method": "Simulates a 200% OS-level text-size increase by scaling root font-size, then checks for resulting horizontal overflow or clipped/truncated text (fixed-height containers with overflow:hidden).",
+    "checks": [
+      "custom:zoom_resize"
+    ],
+    "wcag": [
+      {
+        "sc": "1.4.4",
+        "name": "Resize Text",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "VIS-1-2",
+    "title": "Browser Zoom Usable",
+    "category": "Full Audit",
+    "requirement": "Browser Zoom Usable (VIS-1-2)",
+    "expectation": "Using the built-in browser functionality to zoom all page content to 200% (including text), all interactive content MUST remain fully usable.",
+    "tool": "System Settings",
+    "procedure": "Use browser zoom to magnify your viewport to 200% and confirm that all interactive content remains fully usable.",
+    "outcomes": "Pass = all interactive content remains fully usable up to 200% \n\nFail = some interactive content does not remain fully usable between 0 - 200%",
+    "automation": "partial",
+    "method": "Emulates 200% browser zoom (halving the effective viewport at a 1280px baseline) and checks for horizontal scrollbars, overlapping elements, or interactive controls pushed outside the viewport.",
+    "checks": [
+      "custom:zoom_resize"
+    ],
+    "wcag": [
+      {
+        "sc": "1.4.4",
+        "name": "Resize Text",
+        "level": "AA"
+      },
+      {
+        "sc": "1.4.10",
+        "name": "Reflow",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "VIS-1-3",
+    "title": "Browser Zoom - Informed of Changes",
+    "category": "Full Audit",
+    "requirement": "Browser Zoom - Informed of Changes (VIS-1-3)",
+    "expectation": "Using the built-in browser functionality to zoom all page content to 200% (including text), any user actions that result in on-screen changes MUST meet one of the following criteria:\n• A clear visual cue is provided within the viewed area that indicates to the user that the page has changed outside of the currently viewed area based on their action.\n• The resulting change occurs within the currently viewed area.",
+    "tool": "System Settings",
+    "procedure": "Using the browser's built in functionality, set the browser to a width of 1280px and then increase the zoom level to 200% and confirm that when an action is initiated that results in changed content:\n1) clear visual cue is provided within the currently viewed area indicating a change has occurred outside of currently viewed area OR\n2) the resulting change can be observed within the current view.",
+    "outcomes": "Pass = changes of content resulting from user action are accompanied with a clear visual cue within the user's zoomed in view to notify the user OR the changes are visible within the user's zoomed in view\n\nFail = changes of content resulting from user action are accompanied with a clear visual cue within the user's zoomed in view to notify the user OR the changes are visible within the user's zoomed in view\n\nNA = no changes of content resulting from user action occur",
+    "automation": "manual",
+    "method": "Confirming that a user-triggered content change is either visible within, or clearly signalled from, the current 200%-zoomed viewport requires performing the real triggering interaction and observing the result live.",
+    "checks": [],
+    "wcag": []
+  },
+  {
+    "id": "VIS-1-5",
+    "title": "User Text Styling",
+    "category": "Full Audit",
+    "requirement": "User Text Styling (VIS-1-5)",
+    "expectation": "User text style settings do not cause a loss of content when:\n\n- Line height (line spacing) is increased to at least 1.5 times the font size;\n- Spacing following paragraphs is set to at least 2 times the font size;\n- Letter spacing (tracking) is increased to at least 0.12 times the font size;\n- Word spacing is set to at least 0.16 times the font size.",
+    "tool": "Text Spacing Bookmarklet",
+    "procedure": "1) Load the page in the browser of your choice.\n2) Run the Text Spacing Bookmarklet\n3) Perform a visual inspection of the content and confirm that there is not a resulting loss of content or meaning.",
+    "outcomes": "Pass = there is not a resulting loss of content or meaning when any of the four text spacing settings are changed\n\nFail = there is a loss of content or meaning when the four text spacing settings are changed",
+    "automation": "partial",
+    "method": "Injects the WCAG 1.4.12 text-spacing values (line-height 1.5x, paragraph-spacing 2x, letter-spacing 0.12x, word-spacing 0.16x) via CSS and checks for resulting overflow or clipped content.",
+    "checks": [
+      "custom:text_spacing"
+    ],
+    "wcag": [
+      {
+        "sc": "1.4.12",
+        "name": "Text Spacing",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "VIS-2-4",
+    "title": "Not Only Color",
+    "category": "Full Audit",
+    "requirement": "Not Only Color (VIS-2-4)",
+    "expectation": "If a color difference is used to convey information, that information MUST also be available in text or through some other alternative method.\n\nLink text may be distinguished from static text through use of color as long as the following are true:\n\n- A 3:1 contrast ratio difference exists between the link text and other static text\n- A visual indicator is provided when the link receives focus (e.g. visible underline on hover and keyboard focus)",
+    "tool": "Visual Inspection",
+    "procedure": "1) Perform a visual inspection of the page \n2) Confirm that whenever a difference in color is used to convey information, that information is also be available in text or through some other alternative method.",
+    "outcomes": "Pass = a non-color alternative is presented along with color\n\nFail = only color is used to indicate meaning \n\nNA = color is not used to convey meaning",
+    "automation": "partial",
+    "method": "axe-core's link-in-text-block rule confirms links within body text remain distinguishable without relying on color alone. Other color-only-meaning patterns (e.g. red-only form errors) require visual review.",
+    "checks": [
+      "axe:link-in-text-block"
+    ],
+    "wcag": [
+      {
+        "sc": "1.4.1",
+        "name": "Use of Color",
+        "level": "A"
+      }
+    ]
+  },
+  {
+    "id": "VIS-3-2",
+    "title": "No Images of Text",
+    "category": "Full Audit",
+    "requirement": "No Images of Text (VIS-3-2)",
+    "expectation": "Text MUST always be presented using live text and CSS rather than an image of text, except for logos and within pictures where it cannot be avoided (e.g., graphs or screenshots).",
+    "tool": "Visual Inspection",
+    "procedure": "Using the mouse, click and drag over all text on the page to select it.\nHTML text will be selectable. Text that is part of an image will show the entire image being highlighted.\nConfirm that text is presented using text rather than in an image of text, except for logos and within pictures where it cannot be avoided (e.g., graphs or screenshots).",
+    "outcomes": "Pass =images of text are not used\n\nFail = images of text are used",
+    "automation": "manual",
+    "method": "Reliably distinguishing a genuine image of text from a photo, icon, or diagram requires visual/OCR judgment beyond what alt-text or filename heuristics can determine with confidence.",
+    "checks": [],
+    "wcag": [
+      {
+        "sc": "1.4.5",
+        "name": "Images of Text",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "VIS-4-1",
+    "title": "Captions & Audio Description",
+    "category": "Full Audit",
+    "requirement": "Captions & Audio Description (VIS-4-1)",
+    "expectation": "All video (both live AND prerecorded) content MUST include accurate captions. IF video content provides any information visually that is not described by an accompanying audio track, it MUST also include an Audio Description track that fully explains the visual information.",
+    "tool": "Visual Inspection",
+    "procedure": "Confirm that all video content (live AND prerecorded) provides accurate captions via an accessible mechanism. IF video content provides any information visually that is not described by an accompanying audio track, it MUST also include an Audio Description track that fully explains the visual information.",
+    "outcomes": "Pass = all video content has captions AND an audio description track if it is required\n\nFail = all video content does not have captions OR it does not have a required audio description track",
+    "automation": "partial",
+    "method": "Detects <video> elements and checks for a <track kind=\"captions\"> child; flags visual-only video without an accompanying <track kind=\"descriptions\">. Judging caption/description accuracy is manual. Native videos with no declared track are played muted for ~1.5s so JavaScript players can expose caption text tracks; embedded YouTube/Vimeo players are queried for their caption tracks (flagging none, or auto-generated only).",
+    "checks": [
+      "custom:media_tracks",
+      "custom:media_embeds"
+    ],
+    "wcag": [
+      {
+        "sc": "1.2.2",
+        "name": "Captions (Prerecorded)",
+        "level": "A"
+      },
+      {
+        "sc": "1.2.4",
+        "name": "Captions (Live)",
+        "level": "AA"
+      },
+      {
+        "sc": "1.2.5",
+        "name": "Audio Description (Prerecorded)",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "VIS-4-2",
+    "title": "Ways to Provide CC and AD",
+    "category": "Full Audit",
+    "requirement": "Ways to Provide CC and AD (VIS-4-2)",
+    "expectation": "Captions and Audio Description MUST be made available to users via one or more of the following methods (both need not use the same method): \n• always on, included in the original video\n• included as a separate file or track that can be toggled on and off by the user via an accessible mechanism (note: use of Extended Audio Description may complicate this)\n• included as a video file and made available via separate link(s) adjacent to the original video link",
+    "tool": "Visual Inspection",
+    "procedure": "Captions and Audio Description MUST be made available to users via one or more of the following methods (both need not use the same method):\nalways on, included in the original video(open captions)\nincluded as a separate file or track tha can be toggled on and off by the user via an accessible mechanism (note: use of Extended Audio Description may complicate this)\nincluded as a video file and made available via a separate link(s) adjacent to the original video link",
+    "outcomes": "Pass = captions and audio descriptions are made available through an accessible method\n\nFail = captions and audio descriptions are not made available through an accessible method",
+    "automation": "partial",
+    "method": "Checks whether detected video elements expose a caption track, an open-caption note, or an adjacent link plausibly toggling captions. Embedded YouTube/Vimeo players are queried for available caption tracks.",
+    "checks": [
+      "custom:media_tracks",
+      "custom:media_embeds"
+    ],
+    "wcag": [
+      {
+        "sc": "1.2.2",
+        "name": "Captions (Prerecorded)",
+        "level": "A"
+      },
+      {
+        "sc": "1.2.5",
+        "name": "Audio Description (Prerecorded)",
+        "level": "AA"
+      }
+    ]
+  },
+  {
+    "id": "VIS-4-3",
+    "title": "Transcripts for audio-only/video-only",
+    "category": "Full Audit",
+    "requirement": "Transcripts for audio-only/video-only (VIS-4-3)",
+    "expectation": "For audio-only and video-only media, a transcript MUST be provided which provides the same information as presented in the original media content.",
+    "tool": "Visual Inspection",
+    "procedure": "A transcript which provides the same information as presented in the original media content MUST be made available for all audio-only AND/OR video-only content.",
+    "outcomes": "Pass = transcripts are provided\n\nFail = transcripts are not provided\n\nNA = no audio or video only content is present",
+    "automation": "partial",
+    "method": "Detects <audio> elements and video-only content, then checks for a nearby link/text containing \"transcript\".",
+    "checks": [
+      "custom:media_tracks"
+    ],
+    "wcag": [
+      {
+        "sc": "1.2.1",
+        "name": "Audio-only and Video-only (Prerecorded)",
+        "level": "A"
+      }
+    ]
+  }
+]
