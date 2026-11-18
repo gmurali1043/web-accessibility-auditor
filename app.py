@@ -11,7 +11,7 @@ from checker import config, netguard
 from checker.registry import TEST_CASES, all_ids_in_order, AUTOMATION_COUNTS
 from checker.report import audit_urls, compute_overall_summary
 from checker.crawler import discover_pages
-from checker.exporters import to_markdown, to_html, to_xlsx
+from checker.exporters import to_markdown, to_html, to_xlsx, to_json
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 RESULTS_DIR = os.path.join(BASE_DIR, "results")
@@ -237,6 +237,7 @@ def api_crawl_discover():
 EXPORTS = {
     "html": ("accessibility-report.html", lambda reports, title: to_html(reports, title=title)),
     "md": ("accessibility-report.md", lambda reports, title: to_markdown(reports, title=title)),
+    "json": ("accessibility-report.json", lambda reports, title: to_json(reports, title=title)),
 }
 
 

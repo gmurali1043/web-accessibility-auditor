@@ -1,8 +1,9 @@
 """Exports a list of per-page report dicts (see report.py) to Markdown,
-HTML, or XLSX. Results stay grouped by page in every format, with an
+HTML, XLSX, or JSON. Results stay grouped by page in every format, with an
 overall conformance score and a page-by-page score."""
 import datetime
 import html as _html
+import json
 
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
@@ -119,6 +120,40 @@ def to_markdown(reports, title="Web Accessibility Report"):
                         lines.append(f"    - **Fix:** {issue['fix']}")
             lines.append("")
     return "\n".join(lines)
+
+
+# ================================================================ JSON =====
+JSON_SCHEMA_VERSION = 1
+
+
+def to_json(reports, title="Web Accessibility Report"):
+    """Machine-readable export for CI pipelines, dashboards and scripts.
+    Same content as the other formats: an overall summary, then one entry
+    per page with its summary and every test case (status, WCAG mapping,
+    manual test script and findings). Internal working data (_meta) is
+    left out. schema_version is bumped on any breaking change to the shape."""
+    overall = _overall(reports)
+    doc = {
+        "schema_version": JSON_SCHEMA_VERSION,
+        "tool": "Web Accessibility Auditor",
+        "engine": "axe-core 4.13.0 + Playwright",
+        "title": title,
+        "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+        "overall": {"pages": len(reports), **overall},
+        "pages": [
+            {
+                "url": r["url"],
+                "display_name": r["display_name"],
+                "title": r.get("title"),
+                "audited_at": r.get("generated_at"),
+                "summary": r["summary"],
+                "errors": r.get("errors") or [],
+                "test_cases": r["rows"],
+            }
+            for r in reports
+        ],
+    }
+    return json.dumps(doc, indent=2, ensure_ascii=False)
 
 
 # ================================================================ HTML =====

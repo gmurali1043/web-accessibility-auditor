@@ -119,10 +119,15 @@ same `Dockerfile`; give them at least 2 GB of memory and a single instance.
   pages cap. The picker shows which pages came from the sitemap vs. link
   discovery.
 - **Downloads** — every batch (single URL or crawled selection) can be
-  exported as `.html`, `.md`, or `.xlsx`. The Excel workbook has a Summary
+  exported as `.html`, `.md`, `.xlsx`, or `.json`. The Excel workbook has a Summary
   tab (page list + scores, hyperlinked to each page's tab) and one detail
   tab per page listing every issue with its DOM location, a code snippet,
-  and a recommended fix.
+  and a recommended fix. The JSON file is meant for scripts, CI pipelines
+  and dashboards: an `overall` summary, then a `pages` list where each page
+  has its `summary`, any load `errors`, and all 104 `test_cases` with their
+  status, WCAG mapping, manual test steps and `issues` (selector, code
+  snippet, message, fix). Its `schema_version` changes only if the shape
+  changes in a breaking way.
 
 ## How scoring works
 
@@ -162,7 +167,7 @@ checker/
   report.py                 Maps axe + custom-check findings onto the 104
                              test cases, computes scores, batch/cross-page
                              checks
-  exporters.py               HTML / Markdown / XLSX report generation
+  exporters.py               HTML / Markdown / XLSX / JSON report generation
 data/test_cases.json    The 104 classified test cases
 vendor/axe.min.js       axe-core v4.13.0 (vendored, MPL-2.0)
 templates/, static/     Frontend (vanilla HTML/CSS/JS, no build step)
