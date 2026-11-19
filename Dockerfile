@@ -13,8 +13,15 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
+# Playwright is pinned here (requirements.txt stays unpinned for local use)
+# so a new release can't silently break the hosted build. Its bundled
+# Node.js driver needs libatomic1, which the slim base image lacks.
+ARG PLAYWRIGHT_VERSION=1.65.2
+
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt gunicorn \
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends libatomic1 \
+ && pip install --no-cache-dir -r requirements.txt gunicorn "playwright==${PLAYWRIGHT_VERSION}" \
  && python -m playwright install --with-deps chromium \
  && rm -rf /var/lib/apt/lists/*
 
