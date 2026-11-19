@@ -118,7 +118,26 @@ same `Dockerfile`; give them at least 2 GB of memory and a single instance.
   Both sources honor `robots.txt` Disallow rules and share the same Max
   pages cap. The picker shows which pages came from the sitemap vs. link
   discovery.
-- **Downloads** — every batch (single URL or crawled selection) can be
+- **Paste HTML tab** — for pages the auditor can't open itself (behind a
+  login, intranet, local builds): paste the page's HTML, ideally copied from
+  DevTools (right-click `<html>` → Copy → Copy outerHTML, which includes
+  content added by JavaScript), plus optionally the page's URL so relative
+  stylesheets and images load. The HTML is served to the headless browser
+  with a Content-Security-Policy that blocks the page's own scripts and
+  inline handlers (re-running a logged-in page's scripts would usually fail
+  or redirect to a login screen), and only the first page load is allowed,
+  so a `<meta refresh>` can't navigate away. Limitations:
+  - Keyboard tests of menus and accordions need the page's scripts, so they
+    are skipped and their test cases (NAV-1-1, NAV-1-2, INT-5-7) can only
+    FAIL on other evidence, otherwise go to manual review — never PASS.
+  - Event listeners added by JavaScript aren't in copied HTML, so clickable
+    non-button elements are only found when they use inline `onclick`.
+  - Stylesheets, fonts and images that require a login can't load, which
+    can skew color contrast, target size, reflow and text-spacing results.
+  - It's one snapshot: other tabs, dialogs, or form steps need their own
+    paste. Remove personal data before pasting; up to 2,000,000 characters
+    (`MAX_PASTED_HTML_CHARS`).
+- **Downloads** — every batch (single URL, crawled selection, or pasted HTML) can be
   exported as `.html`, `.md`, `.xlsx`, or `.json`. The Excel workbook has a Summary
   tab (page list + scores, hyperlinked to each page's tab) and one detail
   tab per page listing every issue with its DOM location, a code snippet,

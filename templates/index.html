@@ -35,6 +35,9 @@
     <button id="tabbtn-crawl" class="tab-btn" role="tab"
             aria-selected="false" aria-controls="tab-crawl" tabindex="-1"
             data-tab="crawl">Crawl a Site</button>
+    <button id="tabbtn-paste" class="tab-btn" role="tab"
+            aria-selected="false" aria-controls="tab-paste" tabindex="-1"
+            data-tab="paste">Paste HTML</button>
   </div>
 
   <!-- ============================================================ AUDIT == -->
@@ -146,10 +149,58 @@ https://example.com/contact"></textarea>
       <div id="crawl-reportList"></div>
     </section>
   </section>
+
+  <!-- ============================================================ PASTE == -->
+  <section id="tab-paste" class="tab-panel" role="tabpanel"
+           aria-labelledby="tabbtn-paste" tabindex="0" hidden>
+    <div class="panel-card">
+      <h2>Audit pasted HTML source</h2>
+      <p class="panel-intro">For pages the auditor can't open itself, such as pages behind a log-in,
+        intranet pages, or local builds. Open the page in your browser, then copy its HTML: in
+        DevTools (F12), right-click the <code>&lt;html&gt;</code> element and choose
+        <strong>Copy &rarr; Copy outerHTML</strong>. This captures the page as currently displayed,
+        including content added by JavaScript, which <em>View Source</em> doesn't.</p>
+      <label for="htmlInput">Page HTML</label>
+      <textarea id="htmlInput" rows="12" spellcheck="false" aria-describedby="htmlInputHint"
+                placeholder="&lt;!DOCTYPE html&gt;&#10;&lt;html lang=&quot;en&quot;&gt;&#10;..."></textarea>
+      <p id="htmlInputHint" class="field-hint">Remove any personal or confidential data (names, account numbers, tokens in links or forms) before pasting. Up to {{ "{:,}".format(max_pasted_html_chars) }} characters.</p>
+      <label for="htmlBaseUrl">Page URL (optional)</label>
+      <input type="text" id="htmlBaseUrl" inputmode="url" autocomplete="off" aria-describedby="htmlBaseUrlHint"
+             placeholder="https://example.com/account/settings">
+      <p id="htmlBaseUrlHint" class="field-hint">The address the HTML came from. Used to load the page's stylesheets and images from relative links, which makes color-contrast and layout checks more accurate. Files that need you to be logged in still won't load.</p>
+      <details class="limitations">
+        <summary>What pasted-HTML audits can't check</summary>
+        <ul>
+          <li>The page's own scripts don't run, so keyboard tests of menus and accordions are skipped and those test cases go to manual review.</li>
+          <li>Event listeners added by JavaScript aren't part of copied HTML, so clickable elements that aren't real buttons or links may be missed.</li>
+          <li>Stylesheets, fonts and images that need a login can't load, which can make color contrast, layout, reflow and text-spacing results inaccurate.</li>
+          <li>It's a snapshot of one state: content behind tabs, dialogs, or later steps of a form needs its own paste.</li>
+        </ul>
+      </details>
+      <button id="runPasteAuditBtn" class="primary-btn">Audit this HTML</button>
+    </div>
+
+    <section id="paste-status" class="status-banner" role="status" aria-live="polite" hidden></section>
+
+    <section id="paste-results" class="results" hidden aria-labelledby="paste-results-h">
+      <div class="results-header">
+        <h2 id="paste-results-h">Results</h2>
+        <div class="downloads">
+          <span id="paste-dl-label">Download report:</span>
+          <button class="dl-btn" data-fmt="html" aria-describedby="paste-dl-label">.html</button>
+          <button class="dl-btn" data-fmt="md" aria-describedby="paste-dl-label">.md</button>
+          <button class="dl-btn" data-fmt="xlsx" aria-describedby="paste-dl-label">.xlsx</button>
+          <button class="dl-btn" data-fmt="json" aria-describedby="paste-dl-label">.json</button>
+        </div>
+      </div>
+      <div id="paste-overview" class="overview"></div>
+      <div id="paste-reportList"></div>
+    </section>
+  </section>
 </main>
 
 <footer>
-  <p>Runs entirely on your machine (local Playwright + axe-core, no cloud calls). Of the 104 test cases, some are fully automated, most are partially automated with human-reviewable evidence, and the rest are marked <em>Manual Review Required</em> because they need live assistive-technology or physical-device testing. See <a href="#" id="footerTestCasesLink">the full test case mapping</a>.</p>
+  <p>{% if public_mode %}Runs on this server (Playwright + axe-core); pages you audit are loaded by the server, and results are deleted after an hour.{% else %}Runs entirely on your machine (local Playwright + axe-core, no cloud calls).{% endif %} Of the 104 test cases, some are fully automated, most are partially automated with human-reviewable evidence, and the rest are marked <em>Manual Review Required</em> because they need live assistive-technology or physical-device testing. See <a href="#" id="footerTestCasesLink">the full test case mapping</a>.</p>
 </footer>
 
 <dialog id="testCasesDialog">

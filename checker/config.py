@@ -25,6 +25,7 @@ else:
     MAX_URLS_PER_AUDIT = _env_int("MAX_URLS_PER_AUDIT", 25)
     MAX_CRAWL_PAGES = _env_int("MAX_CRAWL_PAGES", 60)
 MAX_CRAWL_DEPTH = 5
+MAX_PASTED_HTML_CHARS = _env_int("MAX_PASTED_HTML_CHARS", 2_000_000)
 
 # Public-mode only: how many audits/crawls may run at once (each launches a
 # headless Chromium), how many more may wait in line, how many jobs one

@@ -1636,16 +1636,18 @@ CHECKS = [
 ]
 
 
-def run_all_checks(page):
-    """Runs every custom check against the page. Returns a flat list of
-    issues, each tagged with its originating check name. A failure in one
-    check never aborts the others."""
+def run_all_checks(page, skip=()):
+    """Runs every custom check against the page (except any named in
+    `skip`). Returns a flat list of issues, each tagged with its originating
+    check name. A failure in one check never aborts the others."""
     try:
         page.evaluate(PRELUDE_JS)
     except Exception:
         pass
     all_issues = []
     for name, fn in CHECKS:
+        if name in skip:
+            continue
         try:
             found = fn(page) or []
         except Exception:

@@ -633,6 +633,38 @@ const CrawlTab = (() => {
 })();
 
 // ============================================================================
+// Paste HTML tab: audit HTML source the auditor can't fetch itself
+// ============================================================================
+const PasteTab = (() => {
+  let batchId = null;
+  const htmlInput = document.getElementById("htmlInput");
+  const baseUrlInput = document.getElementById("htmlBaseUrl");
+  const runBtn = document.getElementById("runPasteAuditBtn");
+  const resultsEl = document.getElementById("paste-results");
+
+  runBtn.addEventListener("click", async () => {
+    const html = htmlInput.value;
+    if (!html.trim()) { showStatusIn("paste-status", "Paste the page's HTML source first.", true); return; }
+    resultsEl.hidden = true;
+    runBtn.disabled = true;
+    showStatusIn("paste-status", "Auditing the pasted HTML... this runs axe-core plus the custom checks and usually takes under a minute.");
+    try {
+      const data = await runJob("/api/audit-html", { html, base_url: baseUrlInput.value.trim() });
+      hideStatusIn("paste-status");
+      batchId = data.batch_id;
+      renderResultsInto("paste", data);
+    } catch (e) {
+      showStatusIn("paste-status", "Error: " + e.message, true);
+    } finally {
+      runBtn.disabled = false;
+    }
+  });
+
+  wireDownloadButtons(resultsEl, () => batchId);
+  return {};
+})();
+
+// ============================================================================
 // Test case mapping dialog
 // ============================================================================
 (function initTestCasesDialog() {

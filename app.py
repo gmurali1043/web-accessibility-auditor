@@ -9,7 +9,7 @@ from flask import Flask, request, jsonify, render_template, send_file, abort
 
 from checker import config, netguard
 from checker.registry import TEST_CASES, all_ids_in_order, AUTOMATION_COUNTS
-from checker.report import audit_urls, compute_overall_summary
+from checker.report import audit_urls, audit_html, compute_overall_summary
 from checker.crawler import discover_pages
 from checker.exporters import to_markdown, to_html, to_xlsx, to_json
 
@@ -19,6 +19,8 @@ if not config.PUBLIC_MODE:
     os.makedirs(RESULTS_DIR, exist_ok=True)
 
 app = Flask(__name__)
+# Room for the largest pasted HTML document plus JSON encoding overhead.
+app.config["MAX_CONTENT_LENGTH"] = config.MAX_PASTED_HTML_CHARS * 2 + 64 * 1024
 
 if config.PUBLIC_MODE:
     # Behind the hosting platform's reverse proxy: trust its X-Forwarded-For
@@ -47,6 +49,7 @@ def index():
         max_urls=config.MAX_URLS_PER_AUDIT,
         max_crawl_pages=config.MAX_CRAWL_PAGES,
         max_crawl_depth=config.MAX_CRAWL_DEPTH,
+        max_pasted_html_chars=config.MAX_PASTED_HTML_CHARS,
     )
 
 
@@ -199,15 +202,44 @@ def api_audit():
         except Exception as e:
             raise RuntimeError(f"Audit failed: {e}")
 
-        batch_id = uuid.uuid4().hex[:12]
-        with STATE_LOCK:
-            BATCHES[batch_id] = {"reports": reports, "title": "Web Accessibility Report",
-                                 "created": time.time()}
-        return {
-            "batch_id": batch_id,
-            "reports": reports,
-            "overall": compute_overall_summary(reports),
-        }
+        return _store_batch(reports)
+
+    return _start_job(work)
+
+
+def _store_batch(reports):
+    batch_id = uuid.uuid4().hex[:12]
+    with STATE_LOCK:
+        BATCHES[batch_id] = {"reports": reports, "title": "Web Accessibility Report",
+                             "created": time.time()}
+    return {
+        "batch_id": batch_id,
+        "reports": reports,
+        "overall": compute_overall_summary(reports),
+    }
+
+
+@app.route("/api/audit-html", methods=["POST"])
+def api_audit_html():
+    data = request.get_json(force=True, silent=True) or {}
+    html = data.get("html") or ""
+    if not html.strip():
+        return jsonify({"error": "Paste the page's HTML source first."}), 400
+    if len(html) > config.MAX_PASTED_HTML_CHARS:
+        return jsonify({"error": f"That HTML is too large (max {config.MAX_PASTED_HTML_CHARS:,} characters)."}), 400
+    if "<" not in html:
+        return jsonify({"error": "That doesn't look like HTML. Paste the page's HTML source, including its tags."}), 400
+    base_url = None
+    if (data.get("base_url") or "").strip():
+        base_url = _clean_urls([data["base_url"]])[0]
+
+    def work(job):
+        job["progress"] = {"done": 0, "total": 1, "url": base_url}
+        try:
+            reports = audit_html(html, base_url=base_url)
+        except Exception as e:
+            raise RuntimeError(f"Audit failed: {e}")
+        return _store_batch(reports)
 
     return _start_job(work)
 

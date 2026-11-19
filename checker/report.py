@@ -58,7 +58,11 @@ def _new_page(context, url):
     return page, nav_error
 
 
-def build_report_for_page(context, url, display_name=None):
+def build_report_for_page(context, url, display_name=None, skip_checks=(), notes=()):
+    """Audits one page. `skip_checks` names custom checks that can't give a
+    trustworthy result for this page; test cases relying on them are never
+    marked PASS (FAIL only on evidence from other checks, otherwise
+    REVIEW). `notes` are appended to the report's notes."""
     display_name = display_name or url
     page, nav_error = _new_page(context, url)
     if nav_error:
@@ -74,7 +78,7 @@ def build_report_for_page(context, url, display_name=None):
         violations_error = None
 
     axe_issues = axe_runner.violations_to_issues(violations)
-    custom_issues = custom_checks.run_all_checks(page)
+    custom_issues = custom_checks.run_all_checks(page, skip=skip_checks)
     meta = custom_checks.collect_page_meta(page)
     page_title = meta.get("title") or ""
 
@@ -88,6 +92,7 @@ def build_report_for_page(context, url, display_name=None):
             issues_by_tc[tc_id].append(issue)
 
     total_axe_violations = len(axe_issues)
+    unverified_tc_ids = {tc_id for name in skip_checks for tc_id in CUSTOM_MAP.get(name, [])}
 
     rows = []
     for tc_id in all_ids_in_order():
@@ -98,6 +103,8 @@ def build_report_for_page(context, url, display_name=None):
         if tc_id in META_TC_IDS:
             status = "FAIL" if total_axe_violations > 0 else "PASS"
             tc_issues = axe_issues if total_axe_violations > 0 else []
+        elif tc_id in unverified_tc_ids:
+            status = "FAIL" if tc_issues else "REVIEW"
         elif tier == "automated":
             status = "FAIL" if tc_issues else "PASS"
         elif tier == "partial":
@@ -122,7 +129,7 @@ def build_report_for_page(context, url, display_name=None):
         "generated_at": datetime.datetime.now().isoformat(timespec="seconds"),
         "rows": rows,
         "summary": summary,
-        "errors": [violations_error] if violations_error else [],
+        "errors": ([violations_error] if violations_error else []) + list(notes),
         "_meta": meta,
     }
     return report
@@ -219,6 +226,73 @@ def audit_urls(urls, progress_cb=None):
         apply_batch_checks(reports)
 
     return reports
+
+
+# ---------------------------------------------------------------------------
+# Pasted HTML: for pages the browser can't reach (behind a login, intranet,
+# local builds). The HTML is served to the browser as if it came from
+# `base_url` (so relative CSS/images resolve), with a Content-Security-Policy
+# that stops the page's own scripts and inline handlers from running: the
+# pasted markup is usually an already-rendered DOM, and re-running a
+# logged-in page's scripts would typically fail or redirect to a login
+# screen. axe-core and the custom checks run through Playwright, which the
+# CSP doesn't affect. (Disabling JavaScript for the whole context instead
+# stops axe-core itself from completing.)
+# ---------------------------------------------------------------------------
+
+PASTED_HTML_URL = "https://pasted-html.invalid/"
+
+# Keyboard tests of menus/accordions need the page's own scripts to react.
+PASTED_HTML_SKIPPED_CHECKS = ("disclosure_toggle", "menu_keyboard", "hover_menu_keyboard")
+
+PASTED_HTML_NOTE = (
+    "Audited from pasted HTML with the page's own scripts disabled: keyboard "
+    "tests of menus and accordions were skipped (those test cases need manual "
+    "review), and any styles or images that couldn't be loaded may affect "
+    "contrast, layout and reflow results."
+)
+
+
+def audit_html(html, base_url=None):
+    """Audits a pasted HTML document. Returns a one-item list of reports,
+    shaped like audit_urls() output."""
+    url = base_url or PASTED_HTML_URL
+    display_name = f"{base_url} (pasted HTML)" if base_url else "Pasted HTML"
+    served = {"done": False}
+
+    def serve_pasted_html(route):
+        req = route.request
+        try:
+            main_frame_nav = req.is_navigation_request() and req.frame.parent_frame is None
+        except Exception:
+            main_frame_nav = False
+        if not main_frame_nav:
+            route.continue_()
+        elif served["done"]:
+            # e.g. a <meta http-equiv="refresh"> in the pasted markup: stay put.
+            route.abort("aborted")
+        else:
+            served["done"] = True
+            route.fulfill(status=200, body=html, headers={
+                "Content-Type": "text/html; charset=utf-8",
+                "Content-Security-Policy": "script-src 'none'",
+            })
+
+    with sync_playwright() as p:
+        browser = launch_browser(p)
+        try:
+            context = browser.new_context(viewport=VIEWPORT, ignore_https_errors=True)
+            context.route("**/*", serve_pasted_html)
+            try:
+                report = build_report_for_page(context, url, display_name,
+                                               skip_checks=PASTED_HTML_SKIPPED_CHECKS,
+                                               notes=[PASTED_HTML_NOTE])
+            except Exception as e:
+                report = _error_report(url, display_name, str(e))
+            context.close()
+        finally:
+            browser.close()
+    return [report]
 
 
 def compute_overall_summary(reports):
